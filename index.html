@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weltkarte – Orte mit Link & Foto</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title">Weltkarte</div>
+      <div class="brand-sub">Hover-Vorschau + Google-Drive-Fotos (lokal im Browser gespeichert)</div>
+    </div>
+
+    <div class="actions">
+      <button id="btnAdd" class="btn primary" title="Klicke dann in die Karte">Ort hinzufügen</button>
+      <button id="btnExport" class="btn" title="Alle Orte als JSON herunterladen">Export</button>
+      <label class="btn file">
+        Import
+        <input id="fileImport" type="file" accept="application/json,.json" />
+      </label>
+      <button id="btnClear" class="btn danger" title="Alle lokal gespeicherten Orte löschen">Alles löschen</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-title">Gespeicherte Orte</div>
+        <input id="search" class="search" placeholder="Suchen (Titel/Notiz)..." />
+      </div>
+
+      <div id="preview" class="preview hidden">
+        <div class="preview-head">
+          <div class="preview-title" id="previewTitle">—</div>
+          <div class="preview-meta" id="previewMeta">—</div>
+        </div>
+        <img id="previewImg" class="preview-img hidden" alt="" />
+        <div id="previewNoImg" class="preview-noimg">Kein Foto hinterlegt.</div>
+        <div id="previewNote" class="preview-note hidden"></div>
+        <div class="preview-actions">
+          <button id="previewZoom" class="smallbtn">Zoomen</button>
+          <button id="previewOpen" class="smallbtn">Link</button>
+          <button id="previewEdit" class="smallbtn">Editieren</button>
+          <button id="previewDelete" class="smallbtn danger">Löschen</button>
+        </div>
+        <div class="smallhint">
+          Tipp: Für Google Drive muss die Datei <b>öffentlich freigegeben</b> sein, damit die Vorschau ohne Login lädt.
+        </div>
+      </div>
+
+      <div id="list" class="list"></div>
+
+      <div class="hint">
+        <div><b>Hinweise</b></div>
+        <ul>
+          <li><b>Hover</b> über Marker → sofortige <b>Bildvorschau</b>.</li>
+          <li><b>Ort hinzufügen</b> → Button klicken, dann in die Karte klicken.</li>
+          <li>Google-Drive-Links werden automatisch in eine direkte Bild-URL umgewandelt.</li>
+          <li>Daten werden in <b>localStorage</b> gespeichert (nur auf diesem Gerät/Browser).</li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="mapwrap">
+      <div id="map"></div>
+
+      <div id="toast" class="toast" aria-live="polite"></div>
+
+      <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+          <div class="modal-head">
+            <div id="modalTitle" class="modal-title">Ort hinzufügen</div>
+            <button id="modalClose" class="iconbtn" aria-label="Schließen">✕</button>
+          </div>
+
+          <form id="placeForm" class="form">
+            <input type="hidden" id="placeId" />
+            <input type="hidden" id="lat" />
+            <input type="hidden" id="lng" />
+
+            <label>
+              Titel *
+              <input id="title" required maxlength="80" placeholder="z.B. Eiffelturm" />
+            </label>
+
+            <label>
+              Link (URL)
+              <input id="url" type="url" placeholder="https://..." />
+            </label>
+
+            <label>
+              Foto (URL) – optional (auch Google Drive)
+              <input id="photo" type="url" placeholder="https://drive.google.com/file/d/.../view?..." />
+            </label>
+
+            <div class="imgrow">
+              <img id="formImgPreview" class="form-img hidden" alt="" />
+              <div id="formImgHint" class="form-imghint">Foto-Vorschau erscheint hier, wenn die URL gültig ist.</div>
+            </div>
+
+            <label>
+              Notiz – optional
+              <textarea id="note" rows="3" maxlength="500" placeholder="z.B. Besuch im Sommer 2025"></textarea>
+            </label>
+
+            <div class="row">
+              <label class="checkbox">
+                <input id="openNewTab" type="checkbox" checked />
+                Link in neuem Tab öffnen
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="btnCancel" class="btn">Abbrechen</button>
+              <button type="submit" class="btn primary">Speichern</button>
+            </div>
+          </form>
+
+          <div class="smallprint">
+            Google Drive: Datei auf „Jeder mit dem Link“ stellen. Dann reicht der normale Share-Link.
+          </div>
+        </div>
+      </div>
+
+      <div id="addModeBanner" class="banner hidden">
+        <b>Hinzufügen-Modus:</b> Klicke einen Punkt auf der Karte, um einen Ort anzulegen. <button id="btnExitAddMode" class="linkbtn">Beenden</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

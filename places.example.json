@@ -1,0 +1,13 @@
+[
+  {
+    "id": "example_1",
+    "title": "Kölner Dom",
+    "url": "https://de.wikipedia.org/wiki/K%C3%B6lner_Dom",
+    "photo": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs/view?usp=sharing",
+    "note": "Beispiel: Ersetze den Drive-Link durch deinen öffentlich freigegebenen Foto-Link.",
+    "openNewTab": true,
+    "lat": 50.941278,
+    "lng": 6.958281,
+    "createdAt": "2026-02-24T00:00:00.000Z"
+  }
+]
