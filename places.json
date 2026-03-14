@@ -1,0 +1,57 @@
+[
+  {
+    "id": "p_001",
+    "title": "Eiffelturm",
+    "continent": "Europa",
+    "lat": 48.8584,
+    "lng": 2.2945,
+    "url": "https://www.toureiffel.paris/de",
+    "photo": "",
+    "note": "Wahrzeichen von Paris, 330 m hoch.",
+    "createdAt": "2025-01-01T00:00:00Z"
+  },
+  {
+    "id": "p_002",
+    "title": "Machu Picchu",
+    "continent": "Südamerika",
+    "lat": -13.1631,
+    "lng": -72.5450,
+    "url": "https://whc.unesco.org/en/list/274",
+    "photo": "",
+    "note": "Inka-Zitadelle in den Anden, Peru.",
+    "createdAt": "2025-01-02T00:00:00Z"
+  },
+  {
+    "id": "p_003",
+    "title": "Tokio – Shibuya Crossing",
+    "continent": "Asien",
+    "lat": 35.6595,
+    "lng": 139.7004,
+    "url": "https://www.gotokyo.org",
+    "photo": "",
+    "note": "Belebteste Fußgängerkreuzung der Welt.",
+    "createdAt": "2025-01-03T00:00:00Z"
+  },
+  {
+    "id": "p_004",
+    "title": "Grand Canyon",
+    "continent": "Nordamerika",
+    "lat": 36.1069,
+    "lng": -112.1129,
+    "url": "https://www.nps.gov/grca/index.htm",
+    "photo": "",
+    "note": "Schlucht des Colorado River, Arizona.",
+    "createdAt": "2025-01-04T00:00:00Z"
+  },
+  {
+    "id": "p_005",
+    "title": "Köln – Dom",
+    "continent": "Europa",
+    "lat": 50.9413,
+    "lng": 6.9583,
+    "url": "https://www.koelner-dom.de",
+    "photo": "",
+    "note": "Gotische Kathedrale, UNESCO-Weltkulturerbe.",
+    "createdAt": "2025-01-05T00:00:00Z"
+  }
+]
