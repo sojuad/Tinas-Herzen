@@ -12,28 +12,23 @@
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-title">Welt<span>karte</span></div>
-    <div class="brand-sub">places.json · read-only</div>
-  </div>
-</header>
-
 <main class="layout">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-head">
-      <div class="sidebar-title">Filter &amp; Suche</div>
+      <div class="logo-wrap">
+        <img src="https://drive.google.com/thumbnail?id=11Pu2Lif_WJYxbSUheXQdKeTJ6IO1XxLY&sz=w400"
+             alt="Weltkarte" class="logo-img" />
+      </div>
       <div class="search-wrap">
-        <span class="search-icon">⌕</span>
+        <span class="search-icon">&#9906;</span>
         <input id="search" class="search" placeholder="Ort oder Notiz suchen …" autocomplete="off"/>
       </div>
       <div id="chips" class="filter-wrap"></div>
     </div>
 
     <div class="count-bar" id="countBar">Lade …</div>
-
     <div id="list" class="list"></div>
 
     <!-- PREVIEW -->
@@ -44,7 +39,7 @@
       <div id="previewNoImg" class="preview-noimg" style="display:none">Kein Foto hinterlegt</div>
       <div id="previewNote" class="preview-note hidden"></div>
       <div style="margin-top:8px">
-        <button id="previewLink" class="smallbtn" style="display:none">🔗 Link öffnen</button>
+        <button id="previewLink" class="smallbtn" style="display:none">&#128279; Link öffnen</button>
       </div>
     </div>
   </aside>
