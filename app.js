@@ -19,7 +19,7 @@
     const clean = sanitizeUrl(url);
     if (!clean) return '';
     const id = extractDriveId(clean);
-    if (id) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w800`;
+    if (id) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1000`;
     return clean;
   };
 
@@ -96,7 +96,7 @@
     const badge = escHtml(p.continent || '');
     const title = escHtml(p.title);
     if (!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-badge">${badge}</div></div>`;
-    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt="" onerror="this.style.display='none'"/><div class="hc-badge">${badge}</div></div>`;
+    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-badge">${badge}</div></div>`;
   };
 
   const renderMarkers = src => {
