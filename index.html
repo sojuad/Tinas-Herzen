@@ -14,24 +14,35 @@
 
 <main class="layout">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
+
     <div class="sidebar-head">
+
+      <!-- Logo: volle Breite, Höhe dynamisch -->
       <div class="logo-wrap">
-        <img src="https://drive.google.com/thumbnail?id=11Pu2Lif_WJYxbSUheXQdKeTJ6IO1XxLY&sz=w400"
-             alt="Weltkarte" class="logo-img" />
+        <img
+          src="https://drive.google.com/thumbnail?id=11Pu2Lif_WJYxbSUheXQdKeTJ6IO1XxLY&sz=w600"
+          alt="Tinas Herzen"
+          class="logo-img"
+          onload="this.style.opacity=1"
+          style="opacity:0; transition:opacity 0.3s;"
+        />
       </div>
-      <div class="search-wrap">
-        <span class="search-icon">&#9906;</span>
-        <input id="search" class="search" placeholder="Ort oder Notiz suchen …" autocomplete="off"/>
+
+      <!-- Suche & Filter in #80acb8-Bereich -->
+      <div class="sidebar-controls">
+        <div class="search-wrap">
+          <span class="search-icon">&#9906;</span>
+          <input id="search" class="search" placeholder="Ort oder Notiz suchen …" autocomplete="off"/>
+        </div>
+        <div id="chips" class="filter-wrap"></div>
       </div>
-      <div id="chips" class="filter-wrap"></div>
+
     </div>
 
     <div class="count-bar" id="countBar">Lade …</div>
     <div id="list" class="list"></div>
 
-    <!-- PREVIEW -->
     <div id="preview" class="preview hidden">
       <div class="preview-title" id="previewTitle"></div>
       <div class="preview-meta" id="previewMeta"></div>
@@ -42,9 +53,9 @@
         <button id="previewLink" class="smallbtn" style="display:none">&#128279; Link öffnen</button>
       </div>
     </div>
+
   </aside>
 
-  <!-- MAP -->
   <section class="mapwrap">
     <div id="map"></div>
     <div id="toast" class="toast"></div>
