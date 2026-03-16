@@ -15,7 +15,8 @@
     } catch { return ''; }
   };
 
-  const normalizePhoto = url => {
+  // Exakt wie V3: sz=w1000
+  const normalizePhotoUrl = url => {
     const clean = sanitizeUrl(url);
     if (!clean) return '';
     const id = extractDriveId(clean);
@@ -25,58 +26,33 @@
 
   const escHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const toCoord = x => (Math.round(x * 1e5) / 1e5).toFixed(5);
-  const toast = msg => {
-    const el = $('toast'); el.textContent = msg; el.classList.add('show');
-    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 2200);
-  };
+  const toast = msg => { const el = $('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 2200); };
 
   let allPlaces = [], activeContinent = 'Alle', searchQ = '', selectedId = null;
 
-  // ── Karte mit dunklerem Meerwasser ──────────────────────────────
+  // ── Karte: OSM als Basis, dunkleres Meer über CSS-Filter in style.css ──
   const map = L.map('map', { center: [20, 10], zoom: 2, worldCopyJump: true, preferCanvas: true });
 
-  // CartoDB Positron – helle Landmasse, dunkles gedämpftes Meer
-  const positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
   });
-
-  // CartoDB Dark Matter – dunkle Karte, sehr dunkles Meer
-  const darkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
-  });
-
-  // Watercolor – künstlerischer Stil mit dunklerem Ozean
-  const watercolor = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg', {
-    maxZoom: 16, attribution: '&copy; Stadia Maps / Stamen'
-  });
-
-  // Satellit Esri
   const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19, attribution: 'Tiles &copy; Esri'
   });
 
-  // Standard – OSM
-  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap'
-  });
-
-  // Stadia Alidade Smooth Dark – schönes dunkles Meer
-  const darkSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20, attribution: '&copy; Stadia Maps'
-  });
-
-  darkSmooth.addTo(map);
-
-  L.control.layers({
-    'Dunkel (Standard)': darkSmooth,
-    'Dark Matter': darkMatter,
-    'Hell (Positron)': positron,
-    'Satellit': esri,
-    'OpenStreetMap': osm,
-  }, null, { position: 'topleft' }).addTo(map);
+  osm.addTo(map);
+  L.control.layers({ 'Karte': osm, 'Satellit': esri }, null, { position: 'topleft' }).addTo(map);
 
   const markersLayer = L.layerGroup().addTo(map);
   const markerById = new Map();
+
+  // ── Hover Tooltip HTML – exakt wie V3 ──────────────────────────
+  const makeHoverTooltipHtml = p => {
+    const photo = normalizePhotoUrl(p.photo);
+    const title = escHtml(p.title);
+    if (!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-muted">Kein Foto</div></div>`;
+    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">Hover-Vorschau</div></div>`;
+  };
 
   const filtered = () => {
     const q = searchQ.toLowerCase();
@@ -86,40 +62,36 @@
       return contMatch && qMatch;
     });
   };
-
   const renderAll = () => { const src = filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
   const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n !== 1 ? 'e' : ''} gefunden`; };
 
-  // ── Hover Tooltip mit Foto ──────────────────────────────────────
-  const hoverHtml = p => {
-    const photo = normalizePhoto(p.photo);
-    const badge = escHtml(p.continent || '');
-    const title = escHtml(p.title);
-    if (!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-muted">${badge}</div></div>`;
-    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${badge} · Hover-Vorschau</div></div>`;
-  };
-
+  // ── Marker rendern – exakt wie V3 ──────────────────────────────
   const renderMarkers = src => {
     markersLayer.clearLayers();
     markerById.clear();
     src.forEach(p => {
-      const m = L.marker([p.lat, p.lng]);
-      m.bindTooltip(hoverHtml(p), {
-        direction: 'top', offset: [0, -8], opacity: 1,
-        className: 'hovercard', sticky: false, permanent: false
+      const marker = L.marker([p.lat, p.lng]);
+
+      // Tooltip (Hover-Vorschau) – V3 Einstellungen
+      marker.bindTooltip(makeHoverTooltipHtml(p), {
+        direction: 'top',
+        offset: [0, -8],
+        opacity: 1,
+        className: 'hovercard',
+        sticky: false
       });
-      m.on('mouseover', function() { this.openTooltip(); });
-      m.on('mouseout', function() { this.closeTooltip(); });
-      m.on('click', () => selectPlace(p.id));
-      m.addTo(markersLayer);
-      markerById.set(p.id, m);
+      marker.on('mouseover', () => marker.openTooltip());
+      marker.on('mouseout', () => marker.closeTooltip());
+      marker.on('click', () => selectPlace(p.id));
+      marker.addTo(markersLayer);
+      markerById.set(p.id, marker);
     });
   };
 
   const listEl = $('list');
   const renderList = src => {
     listEl.innerHTML = '';
-    if (src.length === 0) { listEl.innerHTML = `<div class="empty">Keine Orte gefunden.<br>Versuche einen anderen Filter.</div>`; return; }
+    if (src.length === 0) { listEl.innerHTML = `<div class="empty">Keine Orte gefunden.</div>`; return; }
     src.forEach(p => {
       const card = document.createElement('div');
       card.className = 'card' + (p.id === selectedId ? ' selected' : '');
@@ -137,7 +109,7 @@
         </div>`;
       card.addEventListener('click', e => {
         const action = e.target.closest('[data-action]')?.dataset.action;
-        if (action === 'zoom') { selectPlace(p.id); map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 7), { duration: 0.8 }); markerById.get(p.id)?.openPopup(); }
+        if (action === 'zoom') { selectPlace(p.id); map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 7), { duration: 0.8 }); }
         else if (action === 'open') { window.open(safeUrl, '_blank', 'noopener,noreferrer'); }
         else { selectPlace(p.id); }
       });
@@ -154,18 +126,17 @@
     $('preview').classList.remove('hidden');
     $('previewTitle').textContent = p.title;
     $('previewMeta').textContent = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${p.continent || ''}`;
-    const photo = normalizePhoto(p.photo);
+    const photo = normalizePhotoUrl(p.photo);
     const img = $('previewImg');
     if (photo) { img.src = photo; img.classList.remove('hidden'); $('previewNoImg').style.display = 'none'; }
     else { img.classList.add('hidden'); img.removeAttribute('src'); $('previewNoImg').style.display = 'flex'; }
-    const noteEl = $('previewNote');
-    if (p.note) { noteEl.textContent = p.note; noteEl.classList.remove('hidden'); } else { noteEl.classList.add('hidden'); }
+    if (p.note) { $('previewNote').textContent = p.note; $('previewNote').classList.remove('hidden'); }
+    else { $('previewNote').classList.add('hidden'); }
     const safeUrl = sanitizeUrl(p.url);
     const btnLink = $('previewLink');
     if (safeUrl) { btnLink.style.display = 'inline-flex'; btnLink.onclick = () => window.open(safeUrl, '_blank', 'noopener,noreferrer'); }
     else { btnLink.style.display = 'none'; }
   };
-
   $('previewImg').addEventListener('error', () => { $('previewImg').classList.add('hidden'); $('previewNoImg').style.display = 'flex'; });
 
   const chipsEl = $('chips');
@@ -175,7 +146,11 @@
       const btn = document.createElement('button');
       btn.className = 'chip' + (c === activeContinent ? ' active' : '');
       btn.textContent = c;
-      btn.addEventListener('click', () => { activeContinent = c; document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent === c)); renderAll(); });
+      btn.addEventListener('click', () => {
+        activeContinent = c;
+        document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent === c));
+        renderAll();
+      });
       chipsEl.appendChild(btn);
     });
   };
@@ -188,7 +163,10 @@
       const res = await fetch('./places.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      allPlaces = Array.isArray(data) ? data.filter(p => p.title && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng))).map(p => ({ ...p, lat: Number(p.lat), lng: Number(p.lng) })) : [];
+      allPlaces = Array.isArray(data)
+        ? data.filter(p => p.title && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)))
+              .map(p => ({ ...p, lat: Number(p.lat), lng: Number(p.lng) }))
+        : [];
       buildChips();
       renderAll();
       if (allPlaces.length) selectPlace(allPlaces[0].id);
