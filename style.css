@@ -5,7 +5,6 @@
   --sidebar-bg: #6e828e;
   --border:     rgba(255,255,255,0.18);
   --text:       #ffffff;
-  --muted:      rgba(255,255,255,0.75);
   --shadow:     0 10px 30px rgba(0,0,0,0.45);
   --radius:     14px;
   --sidebar:    340px;
@@ -13,7 +12,6 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
-
 .layout { display: grid; grid-template-columns: var(--sidebar) 1fr; height: 100vh; }
 
 /* ── SIDEBAR ── */
@@ -76,8 +74,12 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 .mapwrap { position: relative; }
 #map { height: 100%; width: 100%; }
 
-/* ── Dunkleres Meer per CSS-Filter auf dem Tile-Layer ── */
-.leaflet-tile-pane { filter: hue-rotate(180deg) saturate(0.6) brightness(0.55) invert(1) hue-rotate(180deg); }
+/*
+  Dunkleres Meer: CartoDB Positron hat bereits helleres Land und dunkleres Wasser.
+  Zusätzlich dimmen wir den Tile-Pane leicht ab – nur Helligkeit, kein Farbshift.
+  Das macht das Wasser dunkler ohne die Marker zu beeinflussen.
+*/
+.leaflet-tile-pane { filter: brightness(0.75) saturate(1.2); }
 
 /* ── TOAST ── */
 .toast { position: absolute; left: 50%; transform: translateX(-50%); bottom: 20px; background: rgba(17,22,38,0.95); border: 1px solid rgba(255,255,255,0.15); padding: 9px 16px; border-radius: 10px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity 0.2s; font-size: 13px; white-space: nowrap; z-index: 500; color: #fff; }
@@ -91,9 +93,19 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 10px;
+  max-width: 320px;
 }
-.hovercard .hc-title { font-weight: 900; font-size: 13px; margin-bottom: 6px; }
-.hovercard img { width: 240px; max-width: 55vw; height: 140px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); display: block; }
+.hovercard .hc-title { font-weight: 900; font-size: 13px; margin-bottom: 6px; color: #e9eefc; }
+.hovercard img {
+  width: 240px;
+  max-width: 55vw;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  display: block;
+}
 .hovercard .hc-muted { margin-top: 6px; color: rgba(233,238,252,0.70); font-size: 12px; }
 
 /* ── EMPTY / LOADING ── */

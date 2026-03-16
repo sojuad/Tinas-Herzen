@@ -15,7 +15,7 @@
     } catch { return ''; }
   };
 
-  // Exakt wie V3: sz=w1000
+  // Exakt wie V3: sz=w1000 für gute Qualität
   const normalizePhotoUrl = url => {
     const clean = sanitizeUrl(url);
     if (!clean) return '';
@@ -30,23 +30,30 @@
 
   let allPlaces = [], activeContinent = 'Alle', searchQ = '', selectedId = null;
 
-  // ── Karte: OSM als Basis, dunkleres Meer über CSS-Filter in style.css ──
+  // ── Karte ── CartoDB Positron: helle Länder, dunkleres Meer, kein API-Key nötig
   const map = L.map('map', { center: [20, 10], zoom: 2, worldCopyJump: true, preferCanvas: true });
 
-  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  const positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
   });
+
+  const darkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap &copy; CARTO'
+  });
+
   const esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19, attribution: 'Tiles &copy; Esri'
   });
 
-  osm.addTo(map);
-  L.control.layers({ 'Karte': osm, 'Satellit': esri }, null, { position: 'topleft' }).addTo(map);
+  positron.addTo(map);
+  L.control.layers({ 'Hell (Standard)': positron, 'Dunkel': darkMatter, 'Satellit': esri }, null, { position: 'topleft' }).addTo(map);
 
   const markersLayer = L.layerGroup().addTo(map);
   const markerById = new Map();
 
-  // ── Hover Tooltip HTML – exakt wie V3 ──────────────────────────
+  // ── Hover Tooltip – exakt wie V3 ───────────────────────────────
   const makeHoverTooltipHtml = p => {
     const photo = normalizePhotoUrl(p.photo);
     const title = escHtml(p.title);
@@ -65,14 +72,12 @@
   const renderAll = () => { const src = filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
   const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n !== 1 ? 'e' : ''} gefunden`; };
 
-  // ── Marker rendern – exakt wie V3 ──────────────────────────────
+  // ── Marker – exakt V3-Einstellungen ────────────────────────────
   const renderMarkers = src => {
     markersLayer.clearLayers();
     markerById.clear();
     src.forEach(p => {
       const marker = L.marker([p.lat, p.lng]);
-
-      // Tooltip (Hover-Vorschau) – V3 Einstellungen
       marker.bindTooltip(makeHoverTooltipHtml(p), {
         direction: 'top',
         offset: [0, -8],
