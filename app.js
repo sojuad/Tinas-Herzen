@@ -95,8 +95,8 @@
     const photo = normalizePhoto(p.photo);
     const badge = escHtml(p.continent || '');
     const title = escHtml(p.title);
-    if (!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-badge">${badge}</div></div>`;
-    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-badge">${badge}</div></div>`;
+    if (!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-muted">${badge}</div></div>`;
+    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${badge} · Hover-Vorschau</div></div>`;
   };
 
   const renderMarkers = src => {
@@ -105,7 +105,7 @@
     src.forEach(p => {
       const m = L.marker([p.lat, p.lng]);
       m.bindTooltip(hoverHtml(p), {
-        direction: 'top', offset: [0, -30], opacity: 1,
+        direction: 'top', offset: [0, -8], opacity: 1,
         className: 'hovercard', sticky: false, permanent: false
       });
       m.on('mouseover', function() { this.openTooltip(); });

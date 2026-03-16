@@ -157,8 +157,8 @@ html, body {
 }
 .leaflet-tooltip.hovercard::before { border-top-color: rgba(26,58,66,0.97); }
 .hovercard .hc-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #ffffff; }
-.hovercard img { width: 220px; max-width: 55vw; height: 130px; object-fit: cover; border-radius: 10px; display: block; border: 1px solid rgba(255,255,255,0.1); }
-.hovercard .hc-badge { margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.65); }
+.hovercard img { width: 240px; max-width: 55vw; height: 140px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); display: block; }
+.hovercard .hc-muted { margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.65); }
 
 /* ── EMPTY / LOADING ── */
 .empty, .loading {
