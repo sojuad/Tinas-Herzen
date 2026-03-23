@@ -84,9 +84,10 @@
     src.forEach(p => {
       const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color)});
       marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
-      marker.on('mouseover', () => marker.openTooltip());
-      marker.on('mouseout',  () => marker.closeTooltip());
-      marker.on('click',     () => selectPlace(p.id));
+      const isMobile = () => window.innerWidth <= 768;
+      marker.on('mouseover', () => { if(!isMobile()) marker.openTooltip(); });
+      marker.on('mouseout',  () => { if(!isMobile()) marker.closeTooltip(); });
+      marker.on('click',     () => { marker.closeTooltip(); selectPlace(p.id); });
       marker.addTo(markersLayer);
       markerById.set(p.id, marker);
     });
@@ -136,8 +137,7 @@
     // Desktop Preview: Hintergrund + Border in Ortsfarbe
     const col = p.color || DEFAULT_COLOR;
     const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
-    $('preview').style.background = `rgba(${pr},${pg},${pb},0.15)`;
-    $('preview').style.borderTopColor = col;
+    $('preview').setAttribute('style', `background:rgba(${pr},${pg},${pb},0.15)!important;border-top-color:${col}!important;border-top-width:3px!important`);
     $('previewTitle').textContent = p.title;
     $('previewMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
     const photo = normalizePhotoUrl(p.photo);
