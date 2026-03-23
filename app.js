@@ -159,8 +159,7 @@
         el.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
         const mob = $(containerId.replace('chips-','chips-mobile-'));
         if(mob) mob.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        $('mobileFilterPanel')?.classList.remove('open');
-        $('mobileFilterBtn')?.classList.remove('open');
+        if(typeof closeMobileFilter==='function') closeMobileFilter();
         renderAll();
       });
       el.appendChild(btn);
@@ -178,8 +177,7 @@
         el.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
         const desk = $(desktopId);
         if(desk) desk.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        $('mobileFilterPanel')?.classList.remove('open');
-        $('mobileFilterBtn')?.classList.remove('open');
+        if(typeof closeMobileFilter==='function') closeMobileFilter();
         renderAll();
       });
       el.appendChild(btn);
@@ -189,10 +187,33 @@
     $('panel-' + id)?.classList.toggle('open');
     $('arrow-'  + id)?.classList.toggle('open');
   };
-  $('mobileFilterBtn')?.addEventListener('click', () => {
-    const open = $('mobileFilterPanel').classList.toggle('open');
-    $('mobileFilterBtn').classList.toggle('open', open);
+  // Mobile Filter – öffnen/schließen
+  const mobileFilterBtn = $('mobileFilterBtn');
+  const mobileFilterPanel = $('mobileFilterPanel');
+  const mobileFilterOverlay = $('mobileFilterOverlay');
+
+  function openMobileFilter() {
+    mobileFilterPanel?.classList.add('open');
+    mobileFilterBtn?.classList.add('open');
+    mobileFilterOverlay?.classList.add('open');
+    // Popup schließen wenn Filter aufgeht
+    $('mobilePopup')?.classList.add('hidden');
+  }
+  function closeMobileFilter() {
+    mobileFilterPanel?.classList.remove('open');
+    mobileFilterBtn?.classList.remove('open');
+    mobileFilterOverlay?.classList.remove('open');
+  }
+
+  mobileFilterBtn?.addEventListener('click', () => {
+    mobileFilterPanel?.classList.contains('open') ? closeMobileFilter() : openMobileFilter();
   });
+
+  // Overlay-Klick schließt Filter
+  mobileFilterOverlay?.addEventListener('click', closeMobileFilter);
+
+  // Chip-Klick schließt Filter automatisch
+  // (wird in buildMobileChips gehandelt – closeMobileFilter ist global verfügbar)
   $('search').addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
   $('search-mobile')?.addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
 
