@@ -64,21 +64,17 @@
   // ── HERZ-MARKER ──────────────────────────────────────────────────
   function makeHeartIcon(color) {
     const c = color || DEFAULT_COLOR;
-    const r = parseInt(c.slice(1,3),16);
-    const g = parseInt(c.slice(3,5),16);
-    const b = parseInt(c.slice(5,7),16);
-    const fill = `rgba(${r},${g},${b},0.2)`;
-    // Herz-SVG: klassische Herzform, 30x28px, keine weißen Ränder
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="28" viewBox="0 0 30 28">
+    // Vollflächig, 60% kleiner (30->12, 28->11), kein Rand
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 30 28">
       <path d="M15 25.5C15 25.5 2 17 2 8.5C2 5 4.5 2 8 2C11 2 13.5 3.8 15 6.2C16.5 3.8 19 2 22 2C25.5 2 28 5 28 8.5C28 17 15 25.5 15 25.5Z"
-        fill="${fill}" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/>
+        fill="${c}" stroke="none"/>
     </svg>`;
     return L.divIcon({
       html: svg,
       className: '',
-      iconSize: [30, 28],
-      iconAnchor: [15, 26],
-      tooltipAnchor: [0, -26]
+      iconSize: [12, 11],
+      iconAnchor: [6, 10],
+      tooltipAnchor: [0, -11]
     });
   }
 
