@@ -66,15 +66,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .smallbtn:hover{background:rgba(255,255,255,0.28);}
 
 /* ── PREVIEW ── */
-.preview{border-top:3px solid var(--border);background:transparent;padding:14px 16px;flex-shrink:0;transition:background 0.3s,border-color 0.3s;}
-.preview.hidden{display:none;}
-.preview-title{font-size:14px;font-weight:700;margin-bottom:4px;color:#fff;}
-.preview-meta{font-size:11px;color:rgba(255,255,255,0.7);font-family:'DM Mono',monospace;margin-bottom:10px;}
-.preview-img{width:100%;height:auto;max-height:220px;object-fit:contain;background:rgba(0,0,0,0.3);border-radius:10px;border:1px solid rgba(255,255,255,0.2);display:block;margin-bottom:10px;}
-.preview-img.hidden{display:none;}
-.preview-noimg{height:48px;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,0.6);border:1px dashed rgba(255,255,255,0.3);border-radius:10px;margin-bottom:10px;}
-.preview-note{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;white-space:pre-wrap;margin-bottom:10px;}
-.preview-note.hidden{display:none;}
+/* desktop sidebar preview entfernt in v17 */
 
 /* ── MAP ── */
 .mapwrap{position:relative;}
@@ -127,6 +119,60 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 }
 /* Leaflet Tooltip Arrow ausblenden */
 .leaflet-tooltip.hovercard-wrap::before { display: none; }
+
+
+/* ── DESKTOP POPUP (schwebt über der Karte beim Klick auf Herz) ── */
+.desktop-popup {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 320px;
+  background: rgba(17,22,38,0.97);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  z-index: 600;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  transition: border-color 0.3s, background 0.3s;
+}
+.desktop-popup.hidden { display: none; }
+.desktop-popup-close {
+  position: absolute; top: 12px; right: 14px;
+  background: rgba(255,255,255,0.1); border: none;
+  color: #fff; font-size: 13px;
+  width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.desktop-popup-close:hover { background: rgba(255,255,255,0.25); }
+.desktop-popup-title {
+  font-size: 16px; font-weight: 700; color: #fff;
+  margin-bottom: 3px; padding-right: 30px; line-height: 1.3;
+}
+.desktop-popup-meta {
+  font-size: 11px; color: rgba(255,255,255,0.6);
+  font-family: 'DM Mono', monospace; margin-bottom: 10px;
+}
+.desktop-popup-img {
+  width: 100%; height: auto;
+  max-height: 200px; object-fit: contain;
+  border-radius: 10px; display: block;
+  margin-bottom: 10px; background: rgba(255,255,255,0.05);
+}
+.desktop-popup-img.hidden { display: none; }
+.desktop-popup-noimg {
+  height: 40px; display: flex; align-items: center;
+  justify-content: center; font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: 8px; margin-bottom: 10px;
+}
+.desktop-popup-noimg.hidden { display: none; }
+.desktop-popup-note {
+  font-size: 12px; color: rgba(255,255,255,0.8);
+  line-height: 1.5; margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+.desktop-popup-note.hidden { display: none; }
 
 /* ── EMPTY / LOADING ── */
 .empty,.loading{padding:20px 12px;text-align:center;color:rgba(255,255,255,0.7);font-size:13px;border:1px dashed rgba(255,255,255,0.25);border-radius:var(--radius);line-height:1.6;}
@@ -220,15 +266,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   /* ── MOBILE POPUP ── */
   .mobile-popup {
     position: absolute;
-    bottom: 16px; left: 12px; right: 12px;
+    /* Höher positionieren damit Browser-Tableleiste nicht überlappt */
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    left: 12px; right: 12px;
     background: rgba(17,22,38,0.6);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 18px;
-    padding: 12px 14px 12px 14px;
+    padding: 10px 12px 10px 12px;
     z-index: 790; box-shadow: var(--shadow);
     display: grid;
     grid-template-rows: auto auto auto auto auto;
-    gap: 6px;
+    gap: 4px;
   }
   .mobile-popup.hidden { display: none; }
   .mobile-popup-close {
@@ -238,16 +286,16 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
   }
   .mobile-popup-title {
-    font-size: 15px; font-weight: 700; color: #fff;
+    font-size: 14px; font-weight: 700; color: #fff;
     padding-right: 32px; margin: 0;
   }
   .mobile-popup-meta {
-    font-size: 10px; color: rgba(255,255,255,0.6);
+    font-size: 9px; color: rgba(255,255,255,0.6);
     font-family: 'DM Mono',monospace; margin: 0;
   }
   .mobile-popup-img {
     width: auto; max-width: 100%;
-    height: auto; max-height: 160px;
+    height: auto; max-height: 110px;
     object-fit: contain;
     background: transparent;
     border-radius: 8px;

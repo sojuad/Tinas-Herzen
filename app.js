@@ -127,31 +127,47 @@
   };
 
   // ── SELECT / PREVIEW ────────────────────────────────────────────
+  // Desktop Popup schließen
+  $('desktopPopupClose')?.addEventListener('click', () => {
+    $('desktopPopup').classList.add('hidden');
+    selectedId = null;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  });
+  // Klick auf Karte schließt Popup
+  document.getElementById('map')?.addEventListener('click', e => {
+    if(!e.target.closest('.leaflet-marker-icon')) {
+      $('desktopPopup')?.classList.add('hidden');
+    }
+  });
+
   const selectPlace = id => {
     selectedId = id;
     document.querySelectorAll('.card').forEach(c => c.classList.toggle('selected', c.dataset.id===id));
     listEl.querySelector(`[data-id="${id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
     const p = allPlaces.find(x => x.id===id);
-    if(!p) { $('preview').classList.add('hidden'); return; }
-    $('preview').classList.remove('hidden');
-    // Desktop Preview: Hintergrund + Border in Ortsfarbe
-    const col = p.color || DEFAULT_COLOR;
-    const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
-    $('preview').setAttribute('style', `background:rgba(${pr},${pg},${pb},1.0)!important;border-top-color:${col}!important;border-top-width:3px!important`);
-    $('previewTitle').textContent = p.title;
-    $('previewMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
-    const photo = normalizePhotoUrl(p.photo);
-    const img   = $('previewImg');
-    if(img) img.style.background = `rgba(${pr},${pg},${pb},0.2)`;
-    if(photo) { img.src=photo; img.classList.remove('hidden'); $('previewNoImg').style.display='none'; }
-    else       { img.classList.add('hidden'); img.removeAttribute('src'); $('previewNoImg').style.display='flex'; }
-    if(p.note) { $('previewNote').textContent=p.note; $('previewNote').classList.remove('hidden'); }
-    else        { $('previewNote').classList.add('hidden'); }
-    // FIX: p.url als Link setzen (nicht p.photo!)
-    const safeUrl  = sanitizeUrl(p.url);
-    const btnLink  = $('previewLink');
-    if(safeUrl) { btnLink.style.display='inline-flex'; btnLink.href=safeUrl; btnLink.target='_blank'; btnLink.rel='noopener noreferrer'; }
-    else         { btnLink.style.display='none'; }
+    if(!p) { $('desktopPopup')?.classList.add('hidden'); return; }
+
+    // ── DESKTOP POPUP ──────────────────────────────────────────
+    const dp = $('desktopPopup');
+    if(dp) {
+      const col = p.color || DEFAULT_COLOR;
+      const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
+      dp.style.borderColor = col;
+      dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
+      $('desktopPopupTitle').textContent = p.title;
+      $('desktopPopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
+      const photo = normalizePhotoUrl(p.photo);
+      const dImg  = $('desktopPopupImg');
+      if(photo) { dImg.src=photo; dImg.classList.remove('hidden'); $('desktopPopupNoImg').classList.add('hidden'); }
+      else       { dImg.classList.add('hidden'); dImg.removeAttribute('src'); $('desktopPopupNoImg').classList.remove('hidden'); }
+      if(p.note) { $('desktopPopupNote').textContent=p.note; $('desktopPopupNote').classList.remove('hidden'); }
+      else        { $('desktopPopupNote').classList.add('hidden'); }
+      const safeUrl = sanitizeUrl(p.url);
+      const dLink   = $('desktopPopupLink');
+      if(safeUrl) { dLink.style.display='inline-flex'; dLink.href=safeUrl; }
+      else         { dLink.style.display='none'; }
+      dp.classList.remove('hidden');
+    }
     // Mobile Popup
     const mp = $('mobilePopup');
     if(mp) {
@@ -175,7 +191,7 @@
       mp.classList.remove('hidden');
     }
   };
-  $('previewImg').addEventListener('error', () => { $('previewImg').classList.add('hidden'); $('previewNoImg').style.display='flex'; });
+  $('desktopPopupImg')?.addEventListener('error', () => { $('desktopPopupImg').classList.add('hidden'); $('desktopPopupNoImg').classList.remove('hidden'); });
   $('mobilePopupClose')?.addEventListener('click', () => $('mobilePopup').classList.add('hidden'));
 
   // ── CHIPS ────────────────────────────────────────────────────────

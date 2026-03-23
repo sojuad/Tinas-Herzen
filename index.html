@@ -70,20 +70,21 @@
     </div>
     <div class="count-bar" id="countBar">Lade …</div>
     <div id="list" class="list"></div>
-    <div id="preview" class="preview hidden">
-      <div class="preview-title" id="previewTitle"></div>
-      <div class="preview-meta" id="previewMeta"></div>
-      <img id="previewImg" class="preview-img hidden" alt=""/>
-      <div id="previewNoImg" class="preview-noimg" style="display:none">Kein Foto hinterlegt</div>
-      <div id="previewNote" class="preview-note hidden"></div>
-      <div style="margin-top:8px">
-        <a id="previewLink" class="smallbtn" href="#" target="_blank" rel="noopener noreferrer" style="display:none">&#128279; Link öffnen</a>
-      </div>
-    </div>
+
   </aside>
   <section class="mapwrap">
     <div id="map"></div>
     <div id="toast" class="toast"></div>
+    <!-- Desktop Popup – erscheint beim Klick auf Herz -->
+    <div id="desktopPopup" class="desktop-popup hidden">
+      <button class="desktop-popup-close" id="desktopPopupClose">&#10005;</button>
+      <div class="desktop-popup-title" id="desktopPopupTitle"></div>
+      <div class="desktop-popup-meta" id="desktopPopupMeta"></div>
+      <img id="desktopPopupImg" class="desktop-popup-img hidden" alt=""/>
+      <div id="desktopPopupNoImg" class="desktop-popup-noimg hidden">Kein Foto hinterlegt</div>
+      <div id="desktopPopupNote" class="desktop-popup-note hidden"></div>
+      <a id="desktopPopupLink" class="smallbtn" href="#" target="_blank" rel="noopener noreferrer" style="display:none">&#128279; Link öffnen</a>
+    </div>
     <div id="mobilePopup" class="mobile-popup hidden">
       <button class="mobile-popup-close" id="mobilePopupClose">✕</button>
       <div class="mobile-popup-title" id="mobilePopupTitle"></div>
