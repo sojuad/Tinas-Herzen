@@ -49,18 +49,16 @@
           <span class="search-icon">&#9906;</span>
           <input id="search" class="search" placeholder="Ort oder Notiz suchen …" autocomplete="off"/>
         </div>
-        <!-- Kontinent Filter -->
         <div class="filter-group">
-          <button class="filter-toggle" id="toggleCont" onclick="toggleFilterGroup('cont')">
+          <button class="filter-toggle" onclick="toggleFilterGroup('cont')">
             Kontinent <span class="filter-arrow" id="arrow-cont">▼</span>
           </button>
           <div class="filter-panel" id="panel-cont">
             <div id="chips-cont" class="filter-wrap"></div>
           </div>
         </div>
-        <!-- Land Filter -->
         <div class="filter-group">
-          <button class="filter-toggle" id="toggleCountry" onclick="toggleFilterGroup('country')">
+          <button class="filter-toggle" onclick="toggleFilterGroup('country')">
             Land <span class="filter-arrow" id="arrow-country">▼</span>
           </button>
           <div class="filter-panel" id="panel-country">
@@ -85,7 +83,6 @@
   <section class="mapwrap">
     <div id="map"></div>
     <div id="toast" class="toast"></div>
-    <!-- Mobile Popup -->
     <div id="mobilePopup" class="mobile-popup hidden">
       <button class="mobile-popup-close" id="mobilePopupClose">✕</button>
       <div class="mobile-popup-title" id="mobilePopupTitle"></div>

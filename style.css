@@ -26,7 +26,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .search::placeholder{color:rgba(255,255,255,0.65);}
 .search:focus{border-color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.28);}
 
-/* ── FILTER GROUPS (herunterklappbar) ── */
+/* ── FILTER GROUPS ── */
 .filter-group{border-radius:10px;overflow:hidden;background:rgba(0,0,0,0.1);}
 .filter-toggle{width:100%;padding:9px 12px;border:none;background:rgba(255,255,255,0.12);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:background 0.15s;}
 .filter-toggle:hover{background:rgba(255,255,255,0.2);}
@@ -34,7 +34,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .filter-arrow.open{transform:rotate(180deg);}
 .filter-panel{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
 .filter-panel.open{max-height:200px;}
-.filter-panel-inner{padding:8px 10px 10px 10px;}
 
 /* ── CHIPS ── */
 .filter-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px 10px 10px;}
@@ -87,14 +86,45 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .toast.show{opacity:1;}
 
 /* ── HOVER TOOLTIP ── */
-.leaflet-tooltip.hovercard{background:rgba(17,22,38,0.96);border:1px solid rgba(255,255,255,0.12);color:#e9eefc;border-radius:14px;box-shadow:var(--shadow);padding:10px;max-width:320px;}
-.hovercard .hc-title{font-weight:900;font-size:13px;margin-bottom:6px;color:#e9eefc;}
-.hovercard img{width:240px;max-width:55vw;height:140px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,0.08);display:block;}
-.hovercard .hc-muted{margin-top:6px;color:rgba(233,238,252,0.70);font-size:12px;}
-
-/* ── CUSTOM MARKER ── */
-.custom-marker{width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid rgba(255,255,255,0.9);box-shadow:0 3px 10px rgba(0,0,0,0.4);transition:transform 0.2s;}
-.custom-marker:hover{transform:rotate(-45deg) scale(1.2);}
+/* .hovercard-wrap ist der Leaflet-Wrapper – kein eigenes Background, da inline gesetzt */
+.leaflet-tooltip.hovercard-wrap {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+/* .hovercard bekommt den Hintergrund inline via JS (= Ort-Farbe) */
+.hovercard {
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 10px;
+  max-width: 320px;
+  border: 2px solid rgba(255,255,255,0.25);
+}
+.hovercard .hc-title {
+  font-weight: 900;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.hovercard img {
+  width: 240px;
+  max-width: 55vw;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: block;
+}
+.hovercard .hc-muted {
+  margin-top: 6px;
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+/* Leaflet Tooltip Arrow ausblenden */
+.leaflet-tooltip.hovercard-wrap::before { display: none; }
 
 /* ── EMPTY / LOADING ── */
 .empty,.loading{padding:20px 12px;text-align:center;color:rgba(255,255,255,0.7);font-size:13px;border:1px dashed rgba(255,255,255,0.25);border-radius:var(--radius);line-height:1.6;}
@@ -121,7 +151,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   .mobile-chips{gap:8px;}
   .mobile-chips .chip{font-size:13px;padding:7px 14px;}
 
-  /* Mobile Popup */
   .mobile-popup{display:block;position:absolute;bottom:20px;left:12px;right:12px;background:rgba(17,22,38,0.97);border:1px solid rgba(255,255,255,0.15);border-radius:18px;padding:16px;z-index:800;box-shadow:var(--shadow);}
   .mobile-popup.hidden{display:none;}
   .mobile-popup-close{position:absolute;top:10px;right:12px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:14px;width:28px;height:28px;border-radius:50%;cursor:pointer;}
@@ -131,5 +160,5 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   .mobile-popup-img.hidden{display:none;}
   .mobile-popup-note{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5;margin-bottom:8px;}
   .mobile-popup-note.hidden{display:none;}
-  .leaflet-tooltip.hovercard{display:none!important;}
+  .leaflet-tooltip.hovercard-wrap{display:none!important;}
 }

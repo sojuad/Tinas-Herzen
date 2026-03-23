@@ -26,23 +26,6 @@
 
   let allPlaces=[], activeCont='Alle', activeCountry='Alle', searchQ='', selectedId=null;
 
-  // ── COLORED MARKER ─────────────────────────────────────────────
-  function makeColorIcon(color) {
-    const c = color || DEFAULT_COLOR;
-    // Hex zu rgba mit 20% Opacity für Marker
-    const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
-    const fill = `rgba(${r},${g},${b},0.2)`;
-    const stroke = c;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
-      <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22S28 24.5 28 14C28 6.27 21.73 0 14 0z"
-            fill="${fill}" stroke="${stroke}" stroke-width="3"/>
-      <circle cx="14" cy="14" r="5" fill="${stroke}" opacity="0.9"/>
-    </svg>`;
-    return L.divIcon({
-      html: svg, className: '', iconSize: [28,36], iconAnchor: [14,36], tooltipAnchor: [0,-36]
-    });
-  }
-
   // ── MAP ─────────────────────────────────────────────────────────
   const map = L.map('map', {center:[20,10], zoom:2, worldCopyJump:true, preferCanvas:false});
   const positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -76,21 +59,24 @@
   const renderAll = () => { const src=filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
   const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n!==1?'e':''} gefunden`; };
 
-  // ── HOVER TOOLTIP ───────────────────────────────────────────────
+  // ── HOVER TOOLTIP – Hintergrund = Ort-Farbe ──────────────────────
   const makeHoverHtml = p => {
     const photo = normalizePhotoUrl(p.photo);
+    const color = p.color || DEFAULT_COLOR;
     const title = escHtml(p.title);
     const sub = escHtml([p.country, p.continent].filter(Boolean).join(' · '));
-    if(!photo) return `<div class="hovercard"><div class="hc-title">${title}</div><div class="hc-muted">${sub}</div></div>`;
-    return `<div class="hovercard"><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
+    // Hintergrundfarbe mit 92% Opacity (etwas transparent, damit es schön aussieht)
+    const style = `style="background:${color}ee;border-color:${color};"`;
+    if(!photo) return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><div class="hc-muted">${sub}</div></div>`;
+    return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
   };
 
-  // ── MARKERS ─────────────────────────────────────────────────────
+  // ── MARKERS – Standard Leaflet (wie V7), kein Custom-SVG ──────────
   const renderMarkers = src => {
     markersLayer.clearLayers(); markerById.clear();
     src.forEach(p => {
-      const marker = L.marker([p.lat, p.lng], {icon: makeColorIcon(p.color)});
-      marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard', sticky:false});
+      const marker = L.marker([p.lat, p.lng]);
+      marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
       marker.on('mouseover', () => marker.openTooltip());
       marker.on('mouseout', () => marker.closeTooltip());
       marker.on('click', () => selectPlace(p.id));
@@ -109,8 +95,7 @@
       const bg = p.color || DEFAULT_COLOR;
       card.className = 'card' + (p.id===selectedId?' selected':'');
       card.dataset.id = p.id;
-      // Hintergrund: Farbe mit Transparenz
-      card.style.background = bg + '33'; // 20% opacity
+      card.style.background = bg + '33';
       card.style.borderLeft = `4px solid ${bg}`;
       const safeUrl = sanitizeUrl(p.url);
       card.innerHTML = `
@@ -156,7 +141,6 @@
     const btnLink = $('previewLink');
     if(safeUrl) { btnLink.style.display='inline-flex'; btnLink.onclick=()=>window.open(safeUrl,'_blank','noopener,noreferrer'); }
     else { btnLink.style.display='none'; }
-    // Mobile Popup
     const mp = $('mobilePopup');
     if(mp) {
       $('mobilePopupTitle').textContent = p.title;
@@ -185,11 +169,9 @@
       btn.addEventListener('click', () => {
         setter(v);
         el.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        // Sync Mobile chips
         const mobileId = containerId.replace('chips-','chips-mobile-');
         const mob = $(mobileId);
         if(mob) mob.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        // Close mobile panel
         $('mobileFilterPanel')?.classList.remove('open');
         $('mobileFilterBtn')?.classList.remove('open');
         renderAll();
@@ -217,21 +199,16 @@
     });
   }
 
-  // ── FILTER GROUP TOGGLE ─────────────────────────────────────────
   window.toggleFilterGroup = id => {
-    const panel = $('panel-' + id);
-    const arrow = $('arrow-' + id);
-    panel.classList.toggle('open');
-    arrow.classList.toggle('open');
+    $('panel-' + id)?.classList.toggle('open');
+    $('arrow-' + id)?.classList.toggle('open');
   };
 
-  // ── MOBILE FILTER BUTTON ────────────────────────────────────────
   $('mobileFilterBtn')?.addEventListener('click', () => {
     const open = $('mobileFilterPanel').classList.toggle('open');
     $('mobileFilterBtn').classList.toggle('open', open);
   });
 
-  // ── SEARCH ──────────────────────────────────────────────────────
   $('search').addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
   $('search-mobile')?.addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
 
@@ -246,18 +223,11 @@
         ? data.filter(p => p.title && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)))
               .map(p => ({...p, lat:Number(p.lat), lng:Number(p.lng), color: p.color || DEFAULT_COLOR}))
         : [];
-
-      // Unique Länder aus Daten
       const countries = [...new Set(allPlaces.map(p => p.country).filter(Boolean))].sort();
-
-      // Desktop Chips
       buildChips('chips-cont', CONTINENTS, activeCont, v => activeCont=v);
       buildChips('chips-country', countries, activeCountry, v => activeCountry=v);
-
-      // Mobile Chips
       buildMobileChips('chips-mobile-cont', CONTINENTS, activeCont, v => activeCont=v, 'chips-cont');
       buildMobileChips('chips-mobile-country', countries, activeCountry, v => activeCountry=v, 'chips-country');
-
       renderAll();
       if(allPlaces.length) selectPlace(allPlaces[0].id);
     } catch(err) {
