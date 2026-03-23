@@ -133,10 +133,19 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* ════════ MOBILE (≤768px) ════════ */
 @media(max-width:768px){
+  /* Kein overflow:hidden auf Mobile - sonst kann nichts fixed werden */
+  html, body { overflow: visible; height: 100%; }
   .sidebar{display:none;}
-  .layout{display:block;height:calc(100vh - var(--mobile-header));margin-top:var(--mobile-header);}
-  .mapwrap{height:100%;}
-  #map{height:100%;} .leaflet-top{top:calc(var(--mobile-header) + 8px)!important;}
+  /* Layout füllt den ganzen Viewport, Map unter dem fixen Header */
+  .layout{
+    display: block;
+    position: fixed;
+    top: var(--mobile-header);
+    left: 0; right: 0; bottom: 0;
+  }
+  .mapwrap{ position: absolute; inset: 0; }
+  #map{ height: 100%; width: 100%; }
+  .leaflet-top{ top: 8px !important; }
 
   .mobile-header{display:flex;align-items:center;gap:8px;position:fixed;top:0;left:0;right:0;height:var(--mobile-header);background:var(--sidebar-bg);padding:6px 10px;z-index:1000;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
   .mobile-logo{height:40px;width:auto;border-radius:6px;flex-shrink:0;object-fit:contain;}
