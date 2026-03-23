@@ -137,7 +137,7 @@
     // Desktop Preview: Hintergrund + Border in Ortsfarbe
     const col = p.color || DEFAULT_COLOR;
     const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
-    $('preview').setAttribute('style', `background:rgba(${pr},${pg},${pb},0.15)!important;border-top-color:${col}!important;border-top-width:3px!important`);
+    $('preview').setAttribute('style', `background:rgba(${pr},${pg},${pb},1.0)!important;border-top-color:${col}!important;border-top-width:3px!important`);
     $('previewTitle').textContent = p.title;
     $('previewMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
     const photo = normalizePhotoUrl(p.photo);
