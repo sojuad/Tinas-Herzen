@@ -112,10 +112,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   background: rgba(0,0,0,0.15);
 }
 .hovercard .hc-muted {
-  margin-top: 6px;
-  color: rgba(255,255,255,0.85);
-  font-size: 12px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  display: none;
 }
 /* Leaflet Tooltip Arrow ausblenden */
 .leaflet-tooltip.hovercard-wrap::before { display: none; }
@@ -125,7 +122,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .desktop-popup {
   position: absolute;
   top: 20px; right: 20px;
-  width: 320px;
+  width: min(420px, calc(100vw - 180px));
   background: rgba(17,22,38,0.97);
   border: 2px solid var(--border);
   border-radius: 18px;
@@ -154,7 +151,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 }
 .desktop-popup-img {
   width: 100%; height: auto;
-  max-height: 200px; object-fit: contain;
+  max-height: 260px; object-fit: contain;
   border-radius: 10px; display: block;
   margin-bottom: 10px; background: rgba(255,255,255,0.05);
 }

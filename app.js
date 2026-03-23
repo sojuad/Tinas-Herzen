@@ -147,6 +147,9 @@
     const p = allPlaces.find(x => x.id===id);
     if(!p) { $('desktopPopup')?.classList.add('hidden'); return; }
 
+    // Photo URL einmal für alle Popups berechnen
+    const photo = normalizePhotoUrl(p.photo);
+
     // ── DESKTOP POPUP ──────────────────────────────────────────
     const dp = $('desktopPopup');
     if(dp) {
@@ -156,7 +159,6 @@
       dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
       $('desktopPopupTitle').textContent = p.title;
       $('desktopPopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
-      const photo = normalizePhotoUrl(p.photo);
       const dImg  = $('desktopPopupImg');
       if(photo) { dImg.src=photo; dImg.classList.remove('hidden'); $('desktopPopupNoImg').classList.add('hidden'); }
       else       { dImg.classList.add('hidden'); dImg.removeAttribute('src'); $('desktopPopupNoImg').classList.remove('hidden'); }
