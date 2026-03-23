@@ -29,10 +29,14 @@
   // ── COLORED MARKER ─────────────────────────────────────────────
   function makeColorIcon(color) {
     const c = color || DEFAULT_COLOR;
+    // Hex zu rgba mit 20% Opacity für Marker
+    const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    const fill = `rgba(${r},${g},${b},0.2)`;
+    const stroke = c;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
       <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 22 14 22S28 24.5 28 14C28 6.27 21.73 0 14 0z"
-            fill="${c}" stroke="white" stroke-width="2.5"/>
-      <circle cx="14" cy="14" r="5" fill="white" opacity="0.9"/>
+            fill="${fill}" stroke="${stroke}" stroke-width="3"/>
+      <circle cx="14" cy="14" r="5" fill="${stroke}" opacity="0.9"/>
     </svg>`;
     return L.divIcon({
       html: svg, className: '', iconSize: [28,36], iconAnchor: [14,36], tooltipAnchor: [0,-36]
