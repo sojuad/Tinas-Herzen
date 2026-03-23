@@ -59,19 +59,18 @@
   const renderAll = () => { const src=filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
   const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n!==1?'e':''} gefunden`; };
 
-  // ── HOVER TOOLTIP – Hintergrund = Ort-Farbe ──────────────────────
+  // ── HOVER TOOLTIP – Hintergrund = Ort-Farbe, Bild vollständig ──
   const makeHoverHtml = p => {
     const photo = normalizePhotoUrl(p.photo);
     const color = p.color || DEFAULT_COLOR;
     const title = escHtml(p.title);
     const sub = escHtml([p.country, p.continent].filter(Boolean).join(' · '));
-    // Hintergrundfarbe mit 92% Opacity (etwas transparent, damit es schön aussieht)
     const style = `style="background:${color}ee;border-color:${color};"`;
     if(!photo) return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><div class="hc-muted">${sub}</div></div>`;
     return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
   };
 
-  // ── MARKERS – Standard Leaflet (wie V7), kein Custom-SVG ──────────
+  // ── MARKERS – Standard Leaflet Pin ────────────────────────────
   const renderMarkers = src => {
     markersLayer.clearLayers(); markerById.clear();
     src.forEach(p => {
@@ -97,6 +96,7 @@
       card.dataset.id = p.id;
       card.style.background = bg + '33';
       card.style.borderLeft = `4px solid ${bg}`;
+      // BUG-FIX: safeUrl muss p.url sein, NICHT p.photo
       const safeUrl = sanitizeUrl(p.url);
       card.innerHTML = `
         <div class="card-top">
@@ -108,15 +108,19 @@
         </div>
         ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
         <div class="card-actions">
-          <button class="smallbtn" data-action="zoom">↗ Zoomen</button>
-          ${safeUrl?`<button class="smallbtn" data-action="open">&#128279; Link</button>`:''}
+          <button class="smallbtn btn-zoom" data-id="${escHtml(p.id)}">↗ Zoomen</button>
+          ${safeUrl ? `<a class="smallbtn btn-link" href="${escHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">&#128279; Link</a>` : ''}
         </div>`;
-      card.addEventListener('click', e => {
-        const action = e.target.closest('[data-action]')?.dataset.action;
-        if(action==='zoom') { selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); }
-        else if(action==='open') { window.open(safeUrl,'_blank','noopener,noreferrer'); }
-        else { selectPlace(p.id); }
+      // BUG-FIX: Link-Button als <a> statt <button> + stopPropagation auf der Karte
+      card.querySelector('.btn-zoom')?.addEventListener('click', e => {
+        e.stopPropagation();
+        selectPlace(p.id);
+        map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8});
       });
+      card.querySelector('.btn-link')?.addEventListener('click', e => {
+        e.stopPropagation(); // verhindert dass selectPlace aufgerufen wird
+      });
+      card.addEventListener('click', () => selectPlace(p.id));
       listEl.appendChild(card);
     });
   };
@@ -137,10 +141,15 @@
     else { img.classList.add('hidden'); img.removeAttribute('src'); $('previewNoImg').style.display='flex'; }
     if(p.note) { $('previewNote').textContent=p.note; $('previewNote').classList.remove('hidden'); }
     else { $('previewNote').classList.add('hidden'); }
+    // BUG-FIX: p.url für den Link (nicht p.photo)
     const safeUrl = sanitizeUrl(p.url);
     const btnLink = $('previewLink');
-    if(safeUrl) { btnLink.style.display='inline-flex'; btnLink.onclick=()=>window.open(safeUrl,'_blank','noopener,noreferrer'); }
-    else { btnLink.style.display='none'; }
+    if(safeUrl) {
+      btnLink.style.display='inline-flex';
+      btnLink.href = safeUrl;
+      btnLink.target = '_blank';
+      btnLink.rel = 'noopener noreferrer';
+    } else { btnLink.style.display='none'; }
     const mp = $('mobilePopup');
     if(mp) {
       $('mobilePopupTitle').textContent = p.title;
@@ -150,85 +159,13 @@
       if(p.note) { $('mobilePopupNote').textContent=p.note; $('mobilePopupNote').classList.remove('hidden'); }
       else { $('mobilePopupNote').classList.add('hidden'); }
       const ml = $('mobilePopupLink');
-      if(safeUrl) { ml.style.display='inline-flex'; ml.onclick=()=>window.open(safeUrl,'_blank','noopener,noreferrer'); }
+      if(safeUrl) { ml.style.display='inline-flex'; ml.href=safeUrl; ml.target='_blank'; ml.rel='noopener noreferrer'; }
       else { ml.style.display='none'; }
       mp.classList.remove('hidden');
     }
   };
   $('previewImg').addEventListener('error', () => { $('previewImg').classList.add('hidden'); $('previewNoImg').style.display='flex'; });
   $('mobilePopupClose')?.addEventListener('click', () => $('mobilePopup').classList.add('hidden'));
-
-  // ── CHIPS BUILDER ──────────────────────────────────────────────
-  function buildChips(containerId, values, activeVal, setter) {
-    const el = $(containerId); if(!el) return;
-    el.innerHTML = '';
-    ['Alle', ...values].forEach(v => {
-      const btn = document.createElement('button');
-      btn.className = 'chip' + (v===activeVal?' active':'');
-      btn.textContent = v;
-      btn.addEventListener('click', () => {
-        setter(v);
-        el.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        const mobileId = containerId.replace('chips-','chips-mobile-');
-        const mob = $(mobileId);
-        if(mob) mob.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        $('mobileFilterPanel')?.classList.remove('open');
-        $('mobileFilterBtn')?.classList.remove('open');
-        renderAll();
-      });
-      el.appendChild(btn);
-    });
-  }
-  function buildMobileChips(containerId, values, activeVal, setter, desktopId) {
-    const el = $(containerId); if(!el) return;
-    el.innerHTML = '';
-    ['Alle', ...values].forEach(v => {
-      const btn = document.createElement('button');
-      btn.className = 'chip' + (v===activeVal?' active':'');
-      btn.textContent = v;
-      btn.addEventListener('click', () => {
-        setter(v);
-        el.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        const desk = $(desktopId);
-        if(desk) desk.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent===v));
-        $('mobileFilterPanel')?.classList.remove('open');
-        $('mobileFilterBtn')?.classList.remove('open');
-        renderAll();
-      });
-      el.appendChild(btn);
-    });
-  }
-
-  window.toggleFilterGroup = id => {
-    $('panel-' + id)?.classList.toggle('open');
-    $('arrow-' + id)?.classList.toggle('open');
-  };
-
-  $('mobileFilterBtn')?.addEventListener('click', () => {
-    const open = $('mobileFilterPanel').classList.toggle('open');
-    $('mobileFilterBtn').classList.toggle('open', open);
-  });
-
-  $('search').addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
-  $('search-mobile')?.addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
-
-  // ── LOAD ────────────────────────────────────────────────────────
-  const loadPlaces = async () => {
-    listEl.innerHTML = '<div class="loading">Lade Orte …</div>';
-    try {
-      const res = await fetch('./places.json?v=' + Date.now());
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      allPlaces = Array.isArray(data)
-        ? data.filter(p => p.title && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)))
-              .map(p => ({...p, lat:Number(p.lat), lng:Number(p.lng), color: p.color || DEFAULT_COLOR}))
-        : [];
-      const countries = [...new Set(allPlaces.map(p => p.country).filter(Boolean))].sort();
-      buildChips('chips-cont', CONTINENTS, activeCont, v => activeCont=v);
-      buildChips('chips-country', countries, activeCountry, v => activeCountry=v);
-      buildMobileChips('chips-mobile-cont', CONTINENTS, activeCont, v => activeCont=v, 'chips-cont');
-      buildMobileChips('chips-mobile-country', countries, activeCountry, v => activeCountry=v, 'chips-country');
-      renderAll();
       if(allPlaces.length) selectPlace(allPlaces[0].id);
     } catch(err) {
       listEl.innerHTML = `<div class="empty">Fehler beim Laden:<br>${escHtml(err.message)}</div>`;
