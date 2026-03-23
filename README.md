@@ -1,4 +1,4 @@
-# Weltkarte v4 – Read-only, GitHub Pages
+Tinas Herzen
 
 ## Dateien
 | Datei | Zweck |
