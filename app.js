@@ -141,22 +141,78 @@
     const btnLink = $('previewLink');
     if (safeUrl) { btnLink.style.display = 'inline-flex'; btnLink.onclick = () => window.open(safeUrl, '_blank', 'noopener,noreferrer'); }
     else { btnLink.style.display = 'none'; }
+
+    // Mobile Popup befuellen
+    const mPop = document.getElementById('mobilePopup');
+    if (mPop) {
+      document.getElementById('mobilePopupTitle').textContent = p.title;
+      document.getElementById('mobilePopupMeta').textContent = toCoord(p.lat) + ', ' + toCoord(p.lng) + '  ·  ' + (p.continent || '');
+      const mImg = document.getElementById('mobilePopupImg');
+      if (photo) { mImg.src = photo; mImg.classList.remove('hidden'); }
+      else { mImg.classList.add('hidden'); mImg.removeAttribute('src'); }
+      const mNote = document.getElementById('mobilePopupNote');
+      if (p.note) { mNote.textContent = p.note; mNote.classList.remove('hidden'); }
+      else { mNote.classList.add('hidden'); }
+      const mLink = document.getElementById('mobilePopupLink');
+      if (safeUrl) { mLink.style.display = 'inline-flex'; mLink.onclick = () => window.open(safeUrl, '_blank', 'noopener,noreferrer'); }
+      else { mLink.style.display = 'none'; }
+      mPop.classList.remove('hidden');
+    }
   };
   $('previewImg').addEventListener('error', () => { $('previewImg').classList.add('hidden'); $('previewNoImg').style.display = 'flex'; });
 
   const chipsEl = $('chips');
+  const chipsElMobile = document.getElementById('chips-mobile');
+
+  // Mobile Filter Button Toggle
+  const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+  const mobileFilterPanel = document.getElementById('mobileFilterPanel');
+  if (mobileFilterBtn && mobileFilterPanel) {
+    mobileFilterBtn.addEventListener('click', () => {
+      const isOpen = mobileFilterPanel.classList.toggle('open');
+      mobileFilterBtn.classList.toggle('open', isOpen);
+    });
+    // Klick ausserhalb schliesst Panel
+    document.addEventListener('click', e => {
+      if (!mobileFilterBtn.contains(e.target) && !mobileFilterPanel.contains(e.target)) {
+        mobileFilterPanel.classList.remove('open');
+        mobileFilterBtn.classList.remove('open');
+      }
+    });
+  }
+
+  // Mobile Suche
+  const mobileSearchEl = document.getElementById('search-mobile');
+  if (mobileSearchEl) {
+    mobileSearchEl.addEventListener('input', e => { searchQ = e.target.value.trim(); renderAll(); });
+  }
+
+  // Mobile Popup schliessen
+  const mobilePopupCloseBtn = document.getElementById('mobilePopupClose');
+  if (mobilePopupCloseBtn) {
+    mobilePopupCloseBtn.addEventListener('click', () => {
+      document.getElementById('mobilePopup').classList.add('hidden');
+    });
+  }
+
+  const $mob = id => document.getElementById(id);
   const buildChips = () => {
-    chipsEl.innerHTML = '';
-    ['Alle', ...CONTINENTS].forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'chip' + (c === activeContinent ? ' active' : '');
-      btn.textContent = c;
-      btn.addEventListener('click', () => {
-        activeContinent = c;
-        document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent === c));
-        renderAll();
+    const containers = [chipsEl, chipsElMobile].filter(Boolean);
+    containers.forEach(container => {
+      container.innerHTML = '';
+      ['Alle', ...CONTINENTS].forEach(label => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (label === activeContinent ? ' active' : '');
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          activeContinent = label;
+          document.querySelectorAll('.chip').forEach(b => b.classList.toggle('active', b.textContent === label));
+          renderAll();
+          if (mobileFilterPanel) { mobileFilterPanel.classList.remove('open'); }
+          if (mobileFilterBtn) { mobileFilterBtn.classList.remove('open'); }
+        });
+        container.appendChild(btn);
       });
-      chipsEl.appendChild(btn);
     });
   };
 
@@ -165,7 +221,7 @@
   const loadPlaces = async () => {
     listEl.innerHTML = '<div class="loading">Lade Orte …</div>';
     try {
-      const res = await fetch('./places.json');
+      const res = await fetch('./places.json?v=' + Date.now());
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       allPlaces = Array.isArray(data)
