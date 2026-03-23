@@ -223,9 +223,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     bottom: 16px; left: 12px; right: 12px;
     background: rgba(17,22,38,0.6);
     border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 18px; padding: 16px 16px 16px 16px;
+    border-radius: 18px; padding: 12px 14px 14px 14px;
     z-index: 790; box-shadow: var(--shadow);
-    max-height: 70vh; overflow-y: auto;
+    max-height: 65vh; overflow-y: auto;
   }
   .mobile-popup.hidden { display: none; }
   .mobile-popup-close {
@@ -234,11 +234,11 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     color: #fff; font-size: 14px;
     width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
   }
-  .mobile-popup-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; padding-right: 32px; }
-  .mobile-popup-meta { font-size: 11px; color: rgba(255,255,255,0.6); font-family: 'DM Mono',monospace; margin-bottom: 10px; }
-  .mobile-popup-img { width: 100%; height: auto; max-height: 240px; object-fit: contain; background: rgba(0,0,0,0.3); border-radius: 12px; display: block; margin-bottom: 10px; }
+  .mobile-popup-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; padding-right: 32px; }
+  .mobile-popup-meta { font-size: 10px; color: rgba(255,255,255,0.6); font-family: 'DM Mono',monospace; margin-bottom: 6px; }
+  .mobile-popup-img { width: 100%; height: auto; max-height: 120px; object-fit: contain; background: rgba(0,0,0,0.3); border-radius: 8px; display: block; margin-bottom: 6px; }
   .mobile-popup-img.hidden { display: none; }
-  .mobile-popup-note { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: 8px; }
+  .mobile-popup-note { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4; margin-bottom: 6px; }
   .mobile-popup-note.hidden { display: none; }
 
   /* Hover-Tooltip auf Mobile deaktivieren */
