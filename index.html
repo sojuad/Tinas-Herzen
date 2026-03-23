@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Weltkarte</title>
+  <title>Tinas Herzen</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -11,6 +11,31 @@
   <link rel="stylesheet" href="./style.css"/>
 </head>
 <body>
+
+<!-- MOBILE HEADER -->
+<header class="mobile-header">
+  <img src="https://drive.google.com/thumbnail?id=11Pu2Lif_WJYxbSUheXQdKeTJ6IO1XxLY&sz=w300"
+       alt="Tinas Herzen" class="mobile-logo"/>
+  <div class="mobile-search-wrap">
+    <span class="search-icon">&#9906;</span>
+    <input id="search-mobile" class="search" placeholder="Suchen …" autocomplete="off"/>
+  </div>
+  <button class="mobile-filter-btn" id="mobileFilterBtn">&#9776;</button>
+</header>
+
+<!-- MOBILE FILTER PANEL -->
+<div class="mobile-filter-panel" id="mobileFilterPanel">
+  <div class="mobile-filter-section">
+    <div class="mobile-filter-label">Kontinent</div>
+    <div id="chips-mobile-cont" class="filter-wrap mobile-chips"></div>
+  </div>
+  <div class="mobile-filter-section">
+    <div class="mobile-filter-label">Land</div>
+    <div id="chips-mobile-country" class="filter-wrap mobile-chips"></div>
+  </div>
+</div>
+
+<!-- DESKTOP LAYOUT -->
 <main class="layout">
   <aside class="sidebar">
     <div class="sidebar-head">
@@ -24,7 +49,24 @@
           <span class="search-icon">&#9906;</span>
           <input id="search" class="search" placeholder="Ort oder Notiz suchen …" autocomplete="off"/>
         </div>
-        <div id="chips" class="filter-wrap"></div>
+        <!-- Kontinent Filter -->
+        <div class="filter-group">
+          <button class="filter-toggle" id="toggleCont" onclick="toggleFilterGroup('cont')">
+            Kontinent <span class="filter-arrow" id="arrow-cont">▼</span>
+          </button>
+          <div class="filter-panel" id="panel-cont">
+            <div id="chips-cont" class="filter-wrap"></div>
+          </div>
+        </div>
+        <!-- Land Filter -->
+        <div class="filter-group">
+          <button class="filter-toggle" id="toggleCountry" onclick="toggleFilterGroup('country')">
+            Land <span class="filter-arrow" id="arrow-country">▼</span>
+          </button>
+          <div class="filter-panel" id="panel-country">
+            <div id="chips-country" class="filter-wrap"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="count-bar" id="countBar">Lade …</div>
@@ -43,8 +85,18 @@
   <section class="mapwrap">
     <div id="map"></div>
     <div id="toast" class="toast"></div>
+    <!-- Mobile Popup -->
+    <div id="mobilePopup" class="mobile-popup hidden">
+      <button class="mobile-popup-close" id="mobilePopupClose">✕</button>
+      <div class="mobile-popup-title" id="mobilePopupTitle"></div>
+      <div class="mobile-popup-meta" id="mobilePopupMeta"></div>
+      <img id="mobilePopupImg" class="mobile-popup-img hidden" alt=""/>
+      <div id="mobilePopupNote" class="mobile-popup-note hidden"></div>
+      <button id="mobilePopupLink" class="smallbtn" style="display:none;margin-top:8px">&#128279; Link öffnen</button>
+    </div>
   </section>
 </main>
+
 <script src="./app.js"></script>
 </body>
 </html>
