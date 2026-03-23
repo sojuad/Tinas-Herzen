@@ -18,7 +18,7 @@
     "lat": -34.916667,
     "lng": 138.6,
     "url": "https://drive.google.com/file/d/1SE09vmYrC9TJ5VbqK76V7DiFaCFWxQ51/view?usp=sharing",
-    "photo": "",
+    "photo": "https://drive.google.com/file/d/1SE09vmYrC9TJ5VbqK76V7DiFaCFWxQ51/view?usp=sharing",
     "note": "Tresas Herz in Adelaide",
     "createdAt": "2025-01-01T00:00:00Z"
   },
@@ -30,7 +30,7 @@
     "lat": 50.849167,
     "lng": 5.689167,
     "url": "https://drive.google.com/file/d/1_znUqaZFli3z0OE11ZtNjYPM7RpEPFB7/view?usp=sharing",
-    "photo": "",
+    "photo": "https://drive.google.com/file/d/1_znUqaZFli3z0OE11ZtNjYPM7RpEPFB7/view?usp=sharing",
     "note": "Veras Herz in Maastricht",
     "createdAt": "2025-01-01T00:00:00Z"
   },
@@ -43,7 +43,7 @@
     "lat": 45.4625,
     "lng": 9.186389,
     "url": "https://drive.google.com/file/d/1ICMEXnobGf9mlwqqQJP8qOk6SgYWwMwg/view?usp=sharing",
-    "photo": "",
+    "photo": "https://drive.google.com/file/d/1ICMEXnobGf9mlwqqQJP8qOk6SgYWwMwg/view?usp=sharing",
     "note": "Herz in Mailand",
     "createdAt": "2025-01-01T00:00:00Z"
   },
