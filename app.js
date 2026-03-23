@@ -133,10 +133,16 @@
     const p = allPlaces.find(x => x.id===id);
     if(!p) { $('preview').classList.add('hidden'); return; }
     $('preview').classList.remove('hidden');
+    // Desktop Preview: Hintergrund + Border in Ortsfarbe
+    const col = p.color || DEFAULT_COLOR;
+    const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
+    $('preview').style.background = `rgba(${pr},${pg},${pb},0.15)`;
+    $('preview').style.borderTopColor = col;
     $('previewTitle').textContent = p.title;
     $('previewMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
     const photo = normalizePhotoUrl(p.photo);
     const img   = $('previewImg');
+    if(img) img.style.background = `rgba(${pr},${pg},${pb},0.2)`;
     if(photo) { img.src=photo; img.classList.remove('hidden'); $('previewNoImg').style.display='none'; }
     else       { img.classList.add('hidden'); img.removeAttribute('src'); $('previewNoImg').style.display='flex'; }
     if(p.note) { $('previewNote').textContent=p.note; $('previewNote').classList.remove('hidden'); }
@@ -149,6 +155,14 @@
     // Mobile Popup
     const mp = $('mobilePopup');
     if(mp) {
+      // Hintergrund + Border in der Ortsfarbe
+      const c = p.color || DEFAULT_COLOR;
+      const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+      mp.style.background = `rgba(${r},${g},${b},0.15)`;
+      mp.style.borderColor = c;
+      // Bildbereich Hintergrund ebenfalls in Ortsfarbe
+      const mi2 = $('mobilePopupImg');
+      if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
       $('mobilePopupTitle').textContent = p.title;
       $('mobilePopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const mi = $('mobilePopupImg');
