@@ -43,7 +43,7 @@
     "title": "Veras Herz in Maastricht",
     "continent": "Europa",
     "country": "Niederlande",
-    "color": "#9b59b6",
+    "color": "#1abc9c",
     "lat": 50.849167,
     "lng": 5.689167,
     "url": "https://de.wikipedia.org/wiki/Maastricht",
@@ -63,44 +63,5 @@
     "photo": "https://drive.google.com/file/d/1ctYiuMGeUqMcZtk3PZDdAYz1drbyuyNr/view?usp=sharing",
     "note": "Sojus Herz in Mailand",
     "createdAt": "2025-01-01T00:00:00Z"
-  },
-  {
-    "id": "p_009",
-    "title": "Machu Picchu",
-    "continent": "Südamerika",
-    "country": "Peru",
-    "color": "#e67e22",
-    "lat": -13.1631,
-    "lng": -72.545,
-    "url": "https://whc.unesco.org/en/list/274",
-    "photo": "",
-    "note": "Inka-Zitadelle in den Anden, Peru.",
-    "createdAt": "2025-01-02T00:00:00Z"
-  },
-  {
-    "id": "p_010",
-    "title": "Tokio – Shibuya Crossing",
-    "continent": "Asien",
-    "country": "Japan",
-    "color": "#e74c3c",
-    "lat": 35.6595,
-    "lng": 139.7004,
-    "url": "https://www.gotokyo.org",
-    "photo": "",
-    "note": "Belebteste Fußgängerkreuzung der Welt.",
-    "createdAt": "2025-01-03T00:00:00Z"
-  },
-  {
-    "id": "p_011",
-    "title": "Grand Canyon",
-    "continent": "Nordamerika",
-    "country": "USA",
-    "color": "#c0392b",
-    "lat": 36.1069,
-    "lng": -112.1129,
-    "url": "https://www.nps.gov/grca/index.htm",
-    "photo": "",
-    "note": "Schlucht des Colorado River, Arizona.",
-    "createdAt": "2025-01-04T00:00:00Z"
   }
 ]
