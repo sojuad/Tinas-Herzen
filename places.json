@@ -1,5 +1,19 @@
 [
   {
+    "id": "p_6c1c4cb19383b_19d350e4fac",
+    "title": "Sojus Herz am Castello Sforzesco",
+    "continent": "Europa",
+    "country": "Italien",
+    "color": "#3498db",
+    "date": "2026-03-21",
+    "lat": 45.4644964,
+    "lng": 9.1895552,
+    "url": "https://www.milanocastello.it/",
+    "photo": "https://drive.google.com/file/d/1OhiTrTAbOlEOxYHXZexZy8eseDIKjpA1/view?usp=sharing",
+    "note": "",
+    "createdAt": "2026-03-28T15:27:03.596Z"
+  },
+  {
     "id": "p_b7d23e34870fc_19d344a2c59",
     "title": "Hennings Herz in Cap de Formentor",
     "continent": "Europa",
@@ -71,13 +85,13 @@
   },
   {
     "id": "p_008",
-    "title": "Sojus Herz in Mailand",
+    "title": "Sojus Herz im Mailänder Dom",
     "continent": "Europa",
     "country": "Italien",
     "color": "#34495e",
     "date": "2026-03-22",
-    "lat": 45.4625,
-    "lng": 9.186389,
+    "lat": 45.4641013,
+    "lng": 9.1919265,
     "url": "https://de.wikipedia.org/wiki/Dom_zu_Mailand",
     "photo": "https://drive.google.com/file/d/1ctYiuMGeUqMcZtk3PZDdAYz1drbyuyNr/view?usp=sharing",
     "note": "Sojus Herz in Mailand",
