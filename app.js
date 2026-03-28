@@ -147,8 +147,9 @@
     const p = allPlaces.find(x => x.id===id);
     if(!p) { $('desktopPopup')?.classList.add('hidden'); return; }
 
-    // Photo URL einmal für alle Popups berechnen
-    const photo = normalizePhotoUrl(p.photo);
+    // Gemeinsame Variablen für alle Popup-Blöcke
+    const photo   = normalizePhotoUrl(p.photo);
+    const safeUrl = sanitizeUrl(p.url);
 
     // ── DESKTOP POPUP ──────────────────────────────────────────
     const dp = $('desktopPopup');
@@ -164,10 +165,19 @@
       else       { dImg.classList.add('hidden'); dImg.removeAttribute('src'); $('desktopPopupNoImg').classList.remove('hidden'); }
       if(p.note) { $('desktopPopupNote').textContent=p.note; $('desktopPopupNote').classList.remove('hidden'); }
       else        { $('desktopPopupNote').classList.add('hidden'); }
-      const safeUrl = sanitizeUrl(p.url);
       const dLink   = $('desktopPopupLink');
       if(safeUrl) { dLink.style.display='inline-flex'; dLink.href=safeUrl; }
       else         { dLink.style.display='none'; }
+      // Datum anzeigen
+      const dDate = $('desktopPopupDate');
+      if(dDate) {
+        if(p.date) {
+          const d = new Date(p.date);
+          const formatted = d.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+          dDate.textContent = '📅 ' + formatted;
+          dDate.classList.remove('hidden');
+        } else { dDate.classList.add('hidden'); }
+      }
       dp.classList.remove('hidden');
     }
     // Mobile Popup
@@ -284,7 +294,9 @@
       buildMobileChips('chips-mobile-cont',    CONTINENTS, activeCont,    v => activeCont=v,    'chips-cont');
       buildMobileChips('chips-mobile-country', countries,  activeCountry, v => activeCountry=v, 'chips-country');
       renderAll();
-      if(allPlaces.length) selectPlace(allPlaces[0].id);
+      // Startort: immer Home Sweet Home (oder ersten Ort)
+      const homePlace = allPlaces.find(p => p.title === 'Home Sweet Home') || allPlaces[0];
+      if(homePlace) selectPlace(homePlace.id);
     } catch(err) {
       listEl.innerHTML = `<div class="empty">Fehler beim Laden:<br>${escHtml(err.message)}</div>`;
       console.error(err);

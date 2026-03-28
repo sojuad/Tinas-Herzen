@@ -170,6 +170,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   white-space: pre-wrap;
 }
 .desktop-popup-note.hidden { display: none; }
+.desktop-popup-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  display: inline-block;
+}
+.desktop-popup-date.hidden { display: none; }
 
 /* ── EMPTY / LOADING ── */
 .empty,.loading{padding:20px 12px;text-align:center;color:rgba(255,255,255,0.7);font-size:13px;border:1px dashed rgba(255,255,255,0.25);border-radius:var(--radius);line-height:1.6;}
