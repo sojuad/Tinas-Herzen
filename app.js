@@ -24,7 +24,7 @@
   const toCoord = x => (Math.round(x*1e5)/1e5).toFixed(5);
   const toast = msg => { const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('show'),2200); };
 
-  let allPlaces=[], activeCont='Alle', activeCountry='Alle', searchQ='', selectedId=null;
+  let allPlaces=[], activeCont='Alle', activeCountry='Alle', activeYear='Alle', searchQ='', selectedId=null;
 
   // ── MAP ──────────────────────────────────────────────────────────
   const map = L.map('map', {center:[20,10], zoom:2, worldCopyJump:true, preferCanvas:false});
@@ -37,13 +37,16 @@
   const markerById = new Map();
 
   // ── FILTER ───────────────────────────────────────────────────────
+  const getYear = p => (p.date && p.date.length >= 4) ? p.date.substring(0,4) : '';
+
   const filtered = () => {
     const q = searchQ.toLowerCase();
     return allPlaces.filter(p => {
-      const cMatch = activeCont === 'Alle' || p.continent === activeCont;
-      const lMatch = activeCountry === 'Alle' || p.country === activeCountry;
+      const cMatch = activeCont    === 'Alle' || p.continent === activeCont;
+      const lMatch = activeCountry === 'Alle' || p.country   === activeCountry;
+      const yMatch = activeYear    === 'Alle' || getYear(p)  === activeYear;
       const qMatch = !q || (p.title||'').toLowerCase().includes(q) || (p.note||'').toLowerCase().includes(q) || (p.country||'').toLowerCase().includes(q) || (p.continent||'').toLowerCase().includes(q);
-      return cMatch && lMatch && qMatch;
+      return cMatch && lMatch && yMatch && qMatch;
     });
   };
   const renderAll = () => { const src=filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
@@ -289,10 +292,14 @@
               .map(p => ({...p, lat:Number(p.lat), lng:Number(p.lng), color: p.color || DEFAULT_COLOR}))
         : [];
       const countries = [...new Set(allPlaces.map(p => p.country).filter(Boolean))].sort();
+      // Jahre aus Datum-Feldern extrahieren, sortiert absteigend (neueste zuerst)
+      const years = [...new Set(allPlaces.map(p => getYear(p)).filter(Boolean))].sort().reverse();
       buildChips('chips-cont',    CONTINENTS, activeCont,    v => activeCont=v);
       buildChips('chips-country', countries,  activeCountry, v => activeCountry=v);
+      buildChips('chips-year',    years,      activeYear,    v => activeYear=v);
       buildMobileChips('chips-mobile-cont',    CONTINENTS, activeCont,    v => activeCont=v,    'chips-cont');
       buildMobileChips('chips-mobile-country', countries,  activeCountry, v => activeCountry=v, 'chips-country');
+      buildMobileChips('chips-mobile-year',    years,      activeYear,    v => activeYear=v,    'chips-year');
       renderAll();
       // Startort: immer Home Sweet Home (oder ersten Ort)
       const homePlace = allPlaces.find(p => p.title === 'Home Sweet Home') || allPlaces[0];

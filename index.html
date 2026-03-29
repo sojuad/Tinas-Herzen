@@ -33,6 +33,10 @@
     <div class="mobile-filter-label">Land</div>
     <div id="chips-mobile-country" class="filter-wrap mobile-chips"></div>
   </div>
+  <div class="mobile-filter-section">
+    <div class="mobile-filter-label">Jahr</div>
+    <div id="chips-mobile-year" class="filter-wrap mobile-chips"></div>
+  </div>
 </div>
 <div class="mobile-filter-overlay" id="mobileFilterOverlay"></div>
 
@@ -64,6 +68,14 @@
           </button>
           <div class="filter-panel" id="panel-country">
             <div id="chips-country" class="filter-wrap"></div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <button class="filter-toggle" onclick="toggleFilterGroup('year')">
+            Jahr <span class="filter-arrow" id="arrow-year">▼</span>
+          </button>
+          <div class="filter-panel" id="panel-year">
+            <div id="chips-year" class="filter-wrap"></div>
           </div>
         </div>
       </div>
