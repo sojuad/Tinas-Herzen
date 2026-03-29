@@ -37,8 +37,6 @@
   const markerById = new Map();
 
   // ── FILTER ───────────────────────────────────────────────────────
-  const getYear = p => (p.date && p.date.length >= 4) ? p.date.substring(0,4) : '';
-
   const filtered = () => {
     const q = searchQ.toLowerCase();
     return allPlaces.filter(p => {
@@ -49,6 +47,9 @@
       return cMatch && lMatch && yMatch && qMatch;
     });
   };
+  // Jahr aus Datum extrahieren – global verfügbar
+  const getYear = p => (p.date && p.date.length >= 4) ? p.date.substring(0,4) : '';
+
   const renderAll = () => { const src=filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
   const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n!==1?'e':''} gefunden`; };
 
