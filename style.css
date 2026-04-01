@@ -90,7 +90,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 10px;
-  max-width: 320px;
+  min-width: 200px;
+  max-width: 280px;
   border: 2px solid rgba(255,255,255,0.25);
 }
 .hovercard .hc-title {
@@ -99,10 +100,15 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   margin-bottom: 6px;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
 }
 .hovercard img {
-  width: 240px;
-  max-width: 55vw;
+  width: 100%;
+  max-width: 260px;
   height: auto;
   max-height: 220px;
   object-fit: contain;
