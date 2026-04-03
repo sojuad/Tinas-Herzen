@@ -86,12 +86,18 @@
   const renderMarkers = src => {
     markersLayer.clearLayers(); markerById.clear();
     src.forEach(p => {
-      const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color)});
+      const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color), interactive: true, bubblingMouseEvents: false});
       marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
       const isMobile = () => window.innerWidth <= 768;
       marker.on('mouseover', () => { if(!isMobile()) marker.openTooltip(); });
       marker.on('mouseout',  () => { if(!isMobile()) marker.closeTooltip(); });
-      marker.on('click',     () => { marker.closeTooltip(); selectPlace(p.id); });
+      // click + touchend für iOS Safari Kompatibilität
+      marker.on('click', () => { marker.closeTooltip(); selectPlace(p.id); });
+      marker.on('touchend', e => {
+        if(e.originalEvent) e.originalEvent.preventDefault();
+        marker.closeTooltip();
+        selectPlace(p.id);
+      });
       marker.addTo(markersLayer);
       markerById.set(p.id, marker);
     });
