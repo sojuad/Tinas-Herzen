@@ -108,12 +108,15 @@
         if(e.originalEvent) e.originalEvent.preventDefault();
         e.originalEvent && e.originalEvent.stopPropagation();
         marker.closeTooltip();
+        // Desktop-Popup auf Touch immer verstecken
+        $('desktopPopup')?.classList.add('hidden');
         selectPlace(p.id);
         touchStarted = false;
       });
       // Click nur auf Desktop (nicht nach Touch)
       marker.on('click', e => {
         if(touchStarted) { touchStarted = false; return; }
+        if(isTouchDevice()) { touchStarted = false; return; }
         marker.closeTooltip();
         selectPlace(p.id);
       });
