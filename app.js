@@ -3,6 +3,9 @@
   const CONTINENTS = ['Europa','Asien','Nordamerika','Südamerika','Afrika','Ozeanien'];
   const DEFAULT_COLOR = '#58a6ff';
 
+  // Touch-Erkennung – global verfügbar für alle Funktionen
+  const isTouchDevice = () => navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
+
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
   const extractDriveId = url => {
     if(!url) return '';
@@ -88,8 +91,6 @@
     src.forEach(p => {
       const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color), interactive: true, bubblingMouseEvents: false});
       marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
-      // Touch-Erkennung (iOS + Android)
-      const isTouchDevice = () => navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
       const isMobile = () => window.innerWidth <= 768;
 
       // Hover-Tooltip nur auf echten Desktop-Mäusen
@@ -179,9 +180,9 @@
     const photo   = normalizePhotoUrl(p.photo);
     const safeUrl = sanitizeUrl(p.url);
 
-    // ── DESKTOP POPUP ──────────────────────────────────────────
+    // ── DESKTOP POPUP (nur auf Desktop) ───────────────────────
     const dp = $('desktopPopup');
-    if(dp) {
+    if(dp && !isTouchDevice()) {
       const col = p.color || DEFAULT_COLOR;
       const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
       dp.style.borderColor = col;
@@ -208,9 +209,9 @@
       }
       dp.classList.remove('hidden');
     }
-    // Mobile Popup
+    // Mobile Popup (nur auf Touch-Geräten)
     const mp = $('mobilePopup');
-    if(mp) {
+    if(mp && isTouchDevice()) {
       // Hintergrund + Border in der Ortsfarbe (opak wie Desktop-Popup)
       const c = p.color || DEFAULT_COLOR;
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
