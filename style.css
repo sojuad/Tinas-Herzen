@@ -301,17 +301,17 @@ body { touch-action: manipulation; }
   /* ── MOBILE POPUP ── */
   .mobile-popup {
     position: absolute;
-    /* Höher positionieren damit Browser-Tableleiste nicht überlappt */
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     left: 12px; right: 12px;
-    background: rgba(17,22,38,0.6);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(17,22,38,0.97);
+    border: 2px solid rgba(255,255,255,0.15);
     border-radius: 18px;
     padding: 10px 12px 10px 12px;
     z-index: 790; box-shadow: var(--shadow);
     display: grid;
     grid-template-rows: auto auto auto auto auto;
     gap: 4px;
+    transition: border-color 0.3s, background 0.3s;
   }
   .mobile-popup.hidden { display: none; }
   .mobile-popup-close {

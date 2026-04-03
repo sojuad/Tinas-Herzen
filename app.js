@@ -211,14 +211,14 @@
     // Mobile Popup
     const mp = $('mobilePopup');
     if(mp) {
-      // Hintergrund + Border in der Ortsfarbe
+      // Hintergrund + Border in der Ortsfarbe (opak wie Desktop-Popup)
       const c = p.color || DEFAULT_COLOR;
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
-      mp.style.background = `rgba(${r},${g},${b},0.15)`;
+      mp.style.background = `rgba(${r},${g},${b},0.92)`;
       mp.style.borderColor = c;
-      // Bildbereich Hintergrund ebenfalls in Ortsfarbe
+      mp.style.borderWidth = '2px';
       const mi2 = $('mobilePopupImg');
-      if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
+      if(mi2) mi2.style.background = 'transparent';
       $('mobilePopupTitle').textContent = p.title;
       $('mobilePopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const mi = $('mobilePopupImg');
