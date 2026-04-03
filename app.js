@@ -1,6 +1,6 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const CONTINENTS = ['Europa','Asien','Nordamerika','Südamerika','Afrika','Ozeanien','Australien'];
+  const CONTINENTS = ['Europa','Asien','Nordamerika','Südamerika','Afrika','Ozeanien'];
   const DEFAULT_COLOR = '#58a6ff';
 
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
