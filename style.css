@@ -191,7 +191,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* ════════ MOBILE (≤768px) ════════ */
 
-/* ── iOS Safari: Marker klickbar machen ── */
+/* ── Touch / iOS Safari Fixes ── */
 .leaflet-marker-icon {
   cursor: pointer !important;
   pointer-events: all !important;
@@ -202,9 +202,16 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   cursor: pointer !important;
   touch-action: manipulation;
 }
-/* iOS: verhindere Delay beim Tippen */
 * { -webkit-tap-highlight-color: transparent; }
 body { touch-action: manipulation; }
+
+/* Hover-Tooltip auf Touch-Geräten (Finger) komplett ausblenden */
+@media (pointer: coarse) {
+  .leaflet-tooltip.hovercard-wrap,
+  .leaflet-tooltip.hovercard {
+    display: none !important;
+  }
+}
 
 @media(max-width:768px){
   /* Mobile: kein Scrolling, echter Fullscreen */
