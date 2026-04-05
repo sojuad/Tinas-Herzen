@@ -91,35 +91,11 @@
     src.forEach(p => {
       const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color), interactive: true, bubblingMouseEvents: false});
       marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
-      const isMobile = () => window.innerWidth <= 768;
-
-      // Hover-Tooltip nur auf echten Desktop-Mäusen
-      marker.on('mouseover', () => {
-        if(!isTouchDevice()) marker.openTooltip();
-      });
-      marker.on('mouseout', () => {
-        if(!isTouchDevice()) marker.closeTooltip();
-      });
-
-      // Touch: touchstart merken, touchend auslösen – verhindert Doppel-Firing mit click
-      let touchStarted = false;
-      marker.on('touchstart', () => { touchStarted = true; });
-      marker.on('touchend', e => {
-        if(e.originalEvent) e.originalEvent.preventDefault();
-        e.originalEvent && e.originalEvent.stopPropagation();
-        marker.closeTooltip();
-        // Desktop-Popup auf Touch immer verstecken
-        $('desktopPopup')?.classList.add('hidden');
-        selectPlace(p.id);
-        touchStarted = false;
-      });
-      // Click nur auf Desktop (nicht nach Touch)
-      marker.on('click', e => {
-        if(touchStarted) { touchStarted = false; return; }
-        if(isTouchDevice()) { touchStarted = false; return; }
-        marker.closeTooltip();
-        selectPlace(p.id);
-      });
+      // Hover nur auf Desktop
+      marker.on('mouseover', () => { if(!isTouchDevice()) marker.openTooltip(); });
+      marker.on('mouseout',  () => { if(!isTouchDevice()) marker.closeTooltip(); });
+      // Klick – funktioniert auf Desktop und Mobile
+      marker.on('click', () => { marker.closeTooltip(); selectPlace(p.id); });
       marker.addTo(markersLayer);
       markerById.set(p.id, marker);
     });
