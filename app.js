@@ -3,7 +3,7 @@
   const CONTINENTS = ['Europa','Asien','Nordamerika','Südamerika','Afrika','Ozeanien'];
   const DEFAULT_COLOR = '#58a6ff';
 
-  // Touch-Erkennung – global verfügbar für alle Funktionen
+  // Touch-Erkennung global (iOS + Android)
   const isTouchDevice = () => navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
@@ -91,11 +91,33 @@
     src.forEach(p => {
       const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color), interactive: true, bubblingMouseEvents: false});
       marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
-      // Hover nur auf Desktop
-      marker.on('mouseover', () => { if(!isTouchDevice()) marker.openTooltip(); });
-      marker.on('mouseout',  () => { if(!isTouchDevice()) marker.closeTooltip(); });
-      // Klick – funktioniert auf Desktop und Mobile
-      marker.on('click', () => { marker.closeTooltip(); selectPlace(p.id); });
+      // Touch-Erkennung (iOS + Android)
+      const isMobile = () => window.innerWidth <= 768;
+
+      // Hover-Tooltip nur auf echten Desktop-Mäusen
+      marker.on('mouseover', () => {
+        if(!isTouchDevice()) marker.openTooltip();
+      });
+      marker.on('mouseout', () => {
+        if(!isTouchDevice()) marker.closeTooltip();
+      });
+
+      // Touch: touchstart merken, touchend auslösen – verhindert Doppel-Firing mit click
+      let touchStarted = false;
+      marker.on('touchstart', () => { touchStarted = true; });
+      marker.on('touchend', e => {
+        if(e.originalEvent) e.originalEvent.preventDefault();
+        e.originalEvent && e.originalEvent.stopPropagation();
+        marker.closeTooltip();
+        selectPlace(p.id);
+        touchStarted = false;
+      });
+      // Click nur auf Desktop (nicht nach Touch)
+      marker.on('click', e => {
+        if(touchStarted) { touchStarted = false; return; }
+        marker.closeTooltip();
+        selectPlace(p.id);
+      });
       marker.addTo(markersLayer);
       markerById.set(p.id, marker);
     });
@@ -159,7 +181,7 @@
     const photo   = normalizePhotoUrl(p.photo);
     const safeUrl = sanitizeUrl(p.url);
 
-    // ── DESKTOP POPUP (nur auf Desktop) ───────────────────────
+    // ── DESKTOP POPUP (nur Desktop) ──────────────────────────────
     const dp = $('desktopPopup');
     if(dp && !isTouchDevice()) {
       const col = p.color || DEFAULT_COLOR;
@@ -188,17 +210,17 @@
       }
       dp.classList.remove('hidden');
     }
-    // Mobile Popup (nur auf Touch-Geräten)
+    // Mobile Popup (nur Touch)
     const mp = $('mobilePopup');
     if(mp && isTouchDevice()) {
-      // Hintergrund + Border in der Ortsfarbe (opak wie Desktop-Popup)
+      // Hintergrund + Border in der Ortsfarbe
       const c = p.color || DEFAULT_COLOR;
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
-      mp.style.background = `rgba(${r},${g},${b},0.92)`;
+      mp.style.background = `rgba(${r},${g},${b},0.15)`;
       mp.style.borderColor = c;
-      mp.style.borderWidth = '2px';
+      // Bildbereich Hintergrund ebenfalls in Ortsfarbe
       const mi2 = $('mobilePopupImg');
-      if(mi2) mi2.style.background = 'transparent';
+      if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
       $('mobilePopupTitle').textContent = p.title;
       $('mobilePopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const mi = $('mobilePopupImg');
