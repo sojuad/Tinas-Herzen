@@ -1,5 +1,4 @@
 [
-
   {
     "id": "p_4da4cd540c2d48_19e0f5b62ae",
     "title": "Tinas Herz in Malaga",
@@ -19,7 +18,7 @@
     "title": "Bines Herz in Sant Pau",
     "continent": "Europa",
     "country": "Spanien",
-    "color": "#81d4fa",
+    "color": "#f48fb1",
     "date": "2026-05-09",
     "lat": 41.4133911,
     "lng": 2.1716664,
@@ -72,7 +71,7 @@
   },
   {
     "id": "p_11af7cc05ebf18_19dea335be8",
-    "title": "Ulrikes Herz auf der Winklmoos Alm",
+    "title": "Ulis Herz auf der Winklmoos Alm",
     "continent": "Europa",
     "country": "Deutschland",
     "color": "#263238",
