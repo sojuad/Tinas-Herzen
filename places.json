@@ -1,5 +1,19 @@
 [
   {
+    "id": "p_f734d73448416_19e1e078057",
+    "title": "Claudis Herz am Fragsburger Wasserfall",
+    "continent": "Europa",
+    "country": "Italien",
+    "color": "#e0f7fa",
+    "date": "2026-05-12",
+    "lat": 46.6348763,
+    "lng": 11.205718,
+    "url": "https://www.meranerland.org/de/freizeit-aktiv/berge-wandern/spazierwege/zu-suedtirols-hoechstem-wasserfall/",
+    "photo": "https://drive.google.com/file/d/14xEoXDL8UcxIXupZNp9GFWokH0Bx3LG3/view?usp=sharing",
+    "note": "Claudis Herz am Fragsburger Wasserfall",
+    "createdAt": "2026-05-12T21:11:08.631Z"
+  },
+  {
     "id": "p_027b9af2d4f1c8_19e1d607723",
     "title": "Katrin und Christels Herz am Schloss Hämelschenburg",
     "continent": "Europa",
