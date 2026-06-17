@@ -1,6 +1,6 @@
 [
   {
-    "id": "p_3cd0e528c7418_19ed3d66a05",
+    "id": "p_f08e4e46d8e1e_19ed3e2ee3e",
     "title": "Sojus Herz am Miners' Monument",
     "continent": "Nordamerika",
     "country": "Kanada",
@@ -11,6 +11,20 @@
     "url": "https://www.sculpturebytps.com/portfolio_page/national-mining-monument/",
     "photo": "https://drive.google.com/file/d/1843Z-S_ivv1BqWYE45oBMHqgLfyNPB2z/view?usp=sharing",
     "note": "Sojus Herz am Miners' Monument",
+    "createdAt": "2026-06-17T04:42:05.246Z"
+  },
+  {
+    "id": "p_3cd0e528c7418_19ed3d66a05",
+    "title": "Sojus Herz in Barrie",
+    "continent": "Nordamerika",
+    "country": "Kanada",
+    "color": "#5d4037",
+    "date": "2026-06-16",
+    "lat": 44.3914623,
+    "lng": -79.6807066,
+    "url": "https://www.barrie.ca/",
+    "photo": "https://drive.google.com/file/d/1QjxrzqspzWXAdzA8tK3oGhEZecTdDAG1/view?usp=sharing",
+    "note": "Sojus Herz in Barrie",
     "createdAt": "2026-06-17T04:28:24.965Z"
   },
   {
