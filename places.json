@@ -155,6 +155,20 @@
   },
   {
     "id": "p_14db55883aefd8_19efaf2b041",
+    "title": "Stephans Herz in Baltimore",
+    "continent": "Nordamerika",
+    "country": "Vereinigte Staaten von Amerika",
+    "color": "#7cb342",
+    "date": "2026-06-23",
+    "lat": 39.281285,
+    "lng": -76.6080544,
+    "url": "https://en.wikipedia.org/wiki/Baltimore",
+    "photo": "https://drive.google.com/file/d/1XH2D66QmIlkuhO882GYygUDbP_UIl14X/view?usp=sharing",
+    "note": "Stephans Herz in Baltimore",
+    "createdAt": "2026-06-24T18:44:29.377Z"
+  },
+  {
+    "id": "p_14db55883aefd8_19efaf2b041",
     "title": "Sojus Herz in the Forks in Winnipeg",
     "continent": "Nordamerika",
     "country": "Kanada",
