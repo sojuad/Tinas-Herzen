@@ -14,6 +14,20 @@
     "createdAt": "2026-07-23T16:58:15.613Z"
   },
   {
+    "id": "p_478eb6ae1d2df8_19f90024438",
+    "title": "Arin und Anjas Herz in Portonovo",
+    "continent": "Europa",
+    "country": "Italien",
+    "color": "#eeeeee",
+    "date": "2026-07-23",
+    "lat": 43.561417,
+    "lng": 13.60025,
+    "url": "https://www.rivieradelconero.info/de/portonovo-bei-ancona/",
+    "photo": "",
+    "note": "Arin und Anjas Herz in Portonovo",
+    "createdAt": "2026-07-23T17:24:55.480Z"
+  },
+  {
     "id": "p_4fffc1663b98c8_19f8fe9dabd",
     "title": "Arin und Anjas Herz in Falconara",
     "continent": "Europa",
@@ -96,6 +110,20 @@
     "photo": "https://drive.google.com/file/d/1xLF12zQVi4K_PS7v2QQfHoOPyUfdSkkT/view?usp=sharing",
     "note": "Arin und Anjas Herz im Valle Verzasca",
     "createdAt": "2026-07-15T20:25:00.577Z"
+  },
+  {
+    "id": "p_6a48e35da8a2d_19f8fefe54f",
+    "title": "Gertrud und Susannes Herz in Paris",
+    "continent": "Europa",
+    "country": "Frankreich",
+    "color": "#aed581",
+    "date": "2026-07-14",
+    "lat": 48.87052,
+    "lng": 2.77864,
+    "url": "https://de.wikipedia.org/wiki/Paris",
+    "photo": "https://drive.google.com/file/d/10arTXgLfZG3_C3pYyk0mOAR4tuinMwqc/view?usp=sharing",
+    "note": "Gertrud und Susannes Herz in Paris",
+    "createdAt": "2026-07-23T17:04:51.535Z"
   },
   {
     "id": "p_a3fba831d4afb8_19f677359b0",
@@ -348,6 +376,20 @@
     "photo": "https://drive.google.com/file/d/1jIj3ju5jwY0uWo6WGHzGKLCkHkpUSWbP/view?usp=sharing",
     "note": "Maria, Micha, Jona und Linas Herz in Valladolid",
     "createdAt": "2026-06-24T18:40:50.801Z"
+  },
+  {
+    "id": "p_6dddb1a050fd68_19f8fffc4c4",
+    "title": "Sojus Herz in the Forks in Winnipeg",
+    "continent": "Nordamerika",
+    "country": "Kanada",
+    "color": "#f06292",
+    "date": "2026-06-21",
+    "lat": 49.8870962,
+    "lng": -97.1294377,
+    "url": "https://www.theforks.com/",
+    "photo": "https://drive.google.com/file/d/1tz4iQA3uCt5-lNuUeJndZbc90Bhq_sdl/view?usp=sharing",
+    "note": "Sojus Herz in the Forks in Winnipeg",
+    "createdAt": "2026-07-23T17:22:11.780Z"
   },
   {
     "id": "p_c3d6c20035b4a8_19efaedee13",
@@ -782,6 +824,20 @@
     "photo": "https://drive.google.com/file/d/1tYo_3Q9r7ez0a3anFtadEKBDQR1rRmz7/view?usp=sharing",
     "note": "Maren und Peters Herz in Heidelberg",
     "createdAt": "2026-06-07T16:43:08.358Z"
+  },
+  {
+    "id": "p_8857313a8a7698_19f8fff304f",
+    "title": "Maren und Peters Herz im Schloss Heidelberg",
+    "continent": "Europa",
+    "country": "Deutschland",
+    "color": "#ffe0b2",
+    "date": "2026-06-06",
+    "lat": 49.4112359,
+    "lng": 8.7144873,
+    "url": "https://www.schloss-heidelberg.de/",
+    "photo": "https://drive.google.com/file/d/1tYo_3Q9r7ez0a3anFtadEKBDQR1rRmz7/view?usp=sharing",
+    "note": "Maren und Peters Herz im Schloss Heidelberg",
+    "createdAt": "2026-07-23T17:21:33.775Z"
   },
   {
     "id": "p_e6f4a9421fc68_19e9c16fcfb",
