@@ -1,5 +1,19 @@
 [
   {
+    "id": "p_d10a8ad13716b8_19fef35036f",
+    "title": "Katrins Herz auf Borkum",
+    "continent": "Europa",
+    "country": "Deutschland",
+    "color": "#009688",
+    "date": "2026-08-10",
+    "lat": 53.594231,
+    "lng": 6.650516,
+    "url": "https://www.borkum.de/",
+    "photo": "https://drive.google.com/file/d/14VBUtF5PXo6JCZ84svgYBtroCK44lf_Q/view?usp=sharing",
+    "note": "Katrins Herz auf Borkum",
+    "createdAt": "2026-08-11T05:04:16.751Z"
+  },
+  {
     "id": "p_eb7f68cd61ad7_19fe1fd8524",
     "title": "Gertruds Herz in Bregenz von der Seebühne",
     "continent": "Europa",
@@ -34,8 +48,8 @@
     "country": "Frankreich",
     "color": "#1e3799",
     "date": "2026-08-06",
-    "lat": 48.850664,
-    "lng": -3.004069,
+    "lat": 48.859735,
+    "lng": -2.986554,
     "url": "https://www.bretagne-reisen.de/reiseziele/die-10-reiseziele/bucht-von-saint-brieuc-paimpol-die-kaps/insel-brehat/",
     "photo": "https://drive.google.com/file/d/10_DraV1c8wl9mt11ErooNSLFQP75JzAA/view?usp=sharing",
     "note": "Sandras Herz auf der Île de Bréhat",
