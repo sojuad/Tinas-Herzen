@@ -1,6 +1,20 @@
 [
   {
-    "id": "p_237236a25d2e08_1a00613a35e",
+    "id": "p_625f29a5612bf_1a006b8935e",
+    "title": "Talias Herz in Savaneta auf Aruba",
+    "continent": "Europa",
+    "country": "Aruba",
+    "color": "#455a64",
+    "date": "2026-08-15",
+    "lat": 12.4471791,
+    "lng": -69.9482233,
+    "url": "https://www.aruba.com/de/unsere-insel/regionen/savaneta",
+    "photo": "https://drive.google.com/file/d/1cgTu9tAFrP6jOvsgEG8wZjP7dnozh733/view?usp=sharing",
+    "note": "Talias Herz in Savaneta auf Aruba",
+    "createdAt": "2026-08-15T18:39:14.782Z"
+  },
+  {
+    "id": "p_197cc0e13a3ac8_1a006b8935e",
     "title": "Veras Herz am Flaucher in den Isarauen",
     "continent": "Europa",
     "country": "Deutschland",
@@ -11,7 +25,7 @@
     "url": "https://www.muenchen.de/freizeit/flaucher-flauchersteg",
     "photo": "https://drive.google.com/file/d/1Da-K0K-DYLD70njuYRatt0aWIS1xqw8b/view?usp=sharing",
     "note": "Veras Herz am Flaucher in den Isarauen",
-    "createdAt": "2026-08-15T15:39:05.438Z"
+    "createdAt": "2026-08-15T18:39:14.782Z"
   },
   {
     "id": "p_a95c155940701_19ffb7e45da",
@@ -328,8 +342,8 @@
     "country": "Frankreich",
     "color": "#aed581",
     "date": "2026-07-14",
-    "lat": 48.87052,
-    "lng": 2.77864,
+    "lat": 48.858904,
+    "lng": 2.3058349,
     "url": "https://de.wikipedia.org/wiki/Paris",
     "photo": "https://drive.google.com/file/d/10arTXgLfZG3_C3pYyk0mOAR4tuinMwqc/view?usp=sharing",
     "note": "Gertrud und Susannes Herz in Paris",
