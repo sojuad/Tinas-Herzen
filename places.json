@@ -1,5 +1,19 @@
 [
   {
+    "id": "p_237236a25d2e08_1a00613a35e",
+    "title": "Veras Herz am Flaucher in den Isarauen",
+    "continent": "Europa",
+    "country": "Deutschland",
+    "color": "#009688",
+    "date": "2026-08-15",
+    "lat": 48.109147,
+    "lng": 11.5582004,
+    "url": "https://www.muenchen.de/freizeit/flaucher-flauchersteg",
+    "photo": "https://drive.google.com/file/d/1Da-K0K-DYLD70njuYRatt0aWIS1xqw8b/view?usp=sharing",
+    "note": "Veras Herz am Flaucher in den Isarauen",
+    "createdAt": "2026-08-15T15:39:05.438Z"
+  },
+  {
     "id": "p_a95c155940701_19ffb7e45da",
     "title": "Andrea, Elke und Katrins Herz an der östlichsten Spitze Borkums",
     "continent": "Europa",
@@ -314,8 +328,8 @@
     "country": "Frankreich",
     "color": "#aed581",
     "date": "2026-07-14",
-    "lat": 48.858904,
-    "lng": 2.3058349,
+    "lat": 48.87052,
+    "lng": 2.77864,
     "url": "https://de.wikipedia.org/wiki/Paris",
     "photo": "https://drive.google.com/file/d/10arTXgLfZG3_C3pYyk0mOAR4tuinMwqc/view?usp=sharing",
     "note": "Gertrud und Susannes Herz in Paris",
