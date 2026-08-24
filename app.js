@@ -3,6 +3,37 @@
   const CONTINENTS = ['Europa','Asien','Nordamerika','Südamerika','Afrika','Ozeanien'];
   const DEFAULT_COLOR = '#58a6ff';
 
+  // Notiz-Text mit eingebetteten Drive-Bildern rendern
+  // Google Drive URLs werden in <img> Tags umgewandelt, Rest bleibt Text
+  const renderNoteWithImages = note => {
+    if(!note) return '';
+    // Drive URL Pattern erkennen
+    const drivePattern = /https?:\/\/(?:drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)|drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+))/g;
+    let html = '';
+    let lastIndex = 0;
+    let match;
+    while((match = drivePattern.exec(note)) !== null) {
+      // Text vor der URL
+      const textBefore = note.slice(lastIndex, match.index).trim();
+      if(textBefore) {
+        html += `<span class="note-text">${textBefore.replace(/\n/g,'<br>')}</span>`;
+      }
+      // Bild aus Drive ID
+      const fileId = match[1] || match[2];
+      const imgUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+      html += `<img class="note-img" src="${imgUrl}" alt="Foto" loading="lazy" onerror="this.style.display='none'"/>`;
+      lastIndex = match.index + match[0].length;
+    }
+    // Restlicher Text nach letzter URL
+    const remaining = note.slice(lastIndex).trim();
+    if(remaining) {
+      html += `<span class="note-text">${remaining.replace(/\n/g,'<br>')}</span>`;
+    }
+    // Kein Drive-Link gefunden: einfach Text
+    if(html === '') html = `<span class="note-text">${note.replace(/\n/g,'<br>')}</span>`;
+    return html;
+  };
+
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
   const extractDriveId = url => {
     if(!url) return '';
@@ -191,8 +222,10 @@
       const dImg  = $('desktopPopupImg');
       if(photo) { dImg.src=photo; dImg.classList.remove('hidden'); $('desktopPopupNoImg').classList.add('hidden'); }
       else       { dImg.classList.add('hidden'); dImg.removeAttribute('src'); $('desktopPopupNoImg').classList.remove('hidden'); }
-      if(p.note) { $('desktopPopupNote').textContent=p.note; $('desktopPopupNote').classList.remove('hidden'); }
-      else        { $('desktopPopupNote').classList.add('hidden'); }
+      if(p.note) {
+        $('desktopPopupNote').innerHTML = renderNoteWithImages(p.note);
+        $('desktopPopupNote').classList.remove('hidden');
+      } else { $('desktopPopupNote').classList.add('hidden'); }
       const dLink   = $('desktopPopupLink');
       if(safeUrl) { dLink.style.display='inline-flex'; dLink.href=safeUrl; }
       else         { dLink.style.display='none'; }
@@ -224,7 +257,7 @@
       const mi = $('mobilePopupImg');
       if(photo) { mi.src=photo; mi.classList.remove('hidden'); } else { mi.classList.add('hidden'); }
       const mn = $('mobilePopupNote');
-      if(p.note) { mn.textContent=p.note; mn.classList.remove('hidden'); } else { mn.classList.add('hidden'); }
+      if(p.note) { mn.innerHTML = renderNoteWithImages(p.note); mn.classList.remove('hidden'); } else { mn.classList.add('hidden'); }
       const ml = $('mobilePopupLink');
       if(safeUrl) { ml.style.display='inline-flex'; ml.href=safeUrl; ml.target='_blank'; ml.rel='noopener noreferrer'; }
       else         { ml.style.display='none'; }
