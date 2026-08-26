@@ -59,7 +59,7 @@
 
   // ── MAP ──────────────────────────────────────────────────────────
   const map = L.map('map', {center:[20,10], zoom:2, worldCopyJump:true, preferCanvas:false});
-  const positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO' });
+  const positron = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom:16, attribution:'&copy; Esri &copy; OpenStreetMap' });
   const dark     = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  { maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO' });
   const esri     = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Tiles &copy; Esri' });
   positron.addTo(map);
@@ -176,7 +176,6 @@
         ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
         <div class="card-actions">
           <button class="smallbtn btn-zoom">↗ Zoomen</button>
-          ${safeUrl ? `<a class="smallbtn btn-link" href="${escHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">&#128279; Link</a>` : ''}
         </div>`;
       card.querySelector('.btn-zoom').addEventListener('click', e => { e.stopPropagation(); selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
       card.querySelector('.btn-link')?.addEventListener('click', e => e.stopPropagation());
