@@ -59,7 +59,7 @@
 
   // ── MAP ──────────────────────────────────────────────────────────
   const map = L.map('map', {center:[20,10], zoom:2, worldCopyJump:true, preferCanvas:false});
-  const positron = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom:16, attribution:'&copy; Esri &copy; OpenStreetMap' });
+  const positron = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap, Tiles: Humanitarian OpenStreetMap Team' });
   const dark     = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  { maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO' });
   const esri     = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Tiles &copy; Esri' });
   positron.addTo(map);
@@ -166,14 +166,7 @@
       card.style.borderLeft = `4px solid ${bg}`;
       const safeUrl = sanitizeUrl(p.url);
       card.innerHTML = `
-        <div class="card-top">
-          <div class="card-title">${escHtml(p.title)}</div>
-          <div class="card-badges">
-            ${p.country   ? `<span class="card-badge">${escHtml(p.country)}</span>`   : ''}
-            ${p.continent ? `<span class="card-badge">${escHtml(p.continent)}</span>` : ''}
-          </div>
-        </div>
-        ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
+        <div class="card-title">${escHtml(p.title)}</div>
         <div class="card-actions">
           <button class="smallbtn btn-zoom">↗ Zoomen</button>
         </div>`;
