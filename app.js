@@ -175,8 +175,6 @@
       card.style.cursor = 'pointer';
       card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
       card.addEventListener('click', () => { selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
-      card.querySelector('.btn-link')?.addEventListener('click', e => e.stopPropagation());
-      card.addEventListener('click', () => selectPlace(p.id));
       listEl.appendChild(card);
     });
   };
