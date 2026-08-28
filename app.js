@@ -8,7 +8,7 @@
   const renderNoteWithImages = note => {
     if(!note) return '';
     // Drive URL Pattern erkennen
-    const drivePattern = /https?:\/\/(?:drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)|drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+))/g;
+    const drivePattern = /https?:\/\/(?:drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)|drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+))(?:[/?][^\s]*)*/g;
     let html = '';
     let lastIndex = 0;
     let match;
