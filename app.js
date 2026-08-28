@@ -34,6 +34,24 @@
     return html;
   };
 
+  // Textfarbe je nach Helligkeit (schwarz oder weiß)
+  const getTextColor = hex => {
+    if(!hex || hex.length < 7) return '#ffffff';
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return (0.299*r + 0.587*g + 0.114*b) > 160 ? '#1a1a1a' : '#ffffff';
+  };
+
+  // Textfarbe je nach Helligkeit der Hintergrundfarbe
+  const getTextColor = hex => {
+    if(!hex || hex.length < 7) return '#ffffff';
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return (0.299*r + 0.587*g + 0.114*b) > 160 ? '#1a1a1a' : '#ffffff';
+  };
+
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
   const extractDriveId = url => {
     if(!url) return '';
@@ -90,7 +108,8 @@
     const color = p.color || DEFAULT_COLOR;
     const title = escHtml(p.title);
     const sub   = escHtml([p.country, p.continent].filter(Boolean).join(' · '));
-    const style = `style="background:${color}ee;border-color:${color};"`;
+    const txtCol = getTextColor(color);
+    const style = `style="background:${color}ee;border-color:${color};color:${txtCol};"`;
     if(!photo) return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><div class="hc-muted">${sub}</div></div>`;
     return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
   };
@@ -162,15 +181,12 @@
       const bg = p.color || DEFAULT_COLOR;
       card.className = 'card' + (p.id===selectedId?' selected':'');
       card.dataset.id = p.id;
-      card.style.background = bg + '33';
-      card.style.borderLeft = `4px solid ${bg}`;
-      const safeUrl = sanitizeUrl(p.url);
-      card.innerHTML = `
-        <div class="card-title">${escHtml(p.title)}</div>
-        <div class="card-actions">
-          <button class="smallbtn btn-zoom">↗ Zoomen</button>
-        </div>`;
-      card.querySelector('.btn-zoom').addEventListener('click', e => { e.stopPropagation(); selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
+      card.style.background = bg;
+      card.style.borderLeft = 'none';
+      card.style.color = getTextColor(bg);
+      card.style.cursor = 'pointer';
+      card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
+      card.addEventListener('click', () => { selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
       card.querySelector('.btn-link')?.addEventListener('click', e => e.stopPropagation());
       card.addEventListener('click', () => selectPlace(p.id));
       listEl.appendChild(card);
@@ -209,6 +225,8 @@
       const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
       dp.style.borderColor = col;
       dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
+      const dpTextColor = getTextColor(col);
+      dp.style.color = dpTextColor;
       $('desktopPopupTitle').textContent = p.title;
       $('desktopPopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const dImg  = $('desktopPopupImg');
@@ -241,6 +259,7 @@
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
       mp.style.background = `rgba(${r},${g},${b},0.15)`;
       mp.style.borderColor = c;
+      mp.style.color = getTextColor(c);
       // Bildbereich Hintergrund ebenfalls in Ortsfarbe
       const mi2 = $('mobilePopupImg');
       if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
