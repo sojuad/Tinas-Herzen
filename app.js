@@ -37,7 +37,7 @@
   const getTextColor = hex => {
     if(!hex || hex.length < 7) return '#ffffff';
     const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-    return (0.299*r+0.587*g+0.114*b)>160 ? '#1a1a1a' : '#ffffff';
+    return (0.299*r+0.587*g+0.114*b)>160 ? '#2d2d2d' : '#ffffff';
   };
 
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
@@ -215,6 +215,9 @@
       ['desktopPopupTitle','desktopPopupMeta','desktopPopupNote','desktopPopupDate'].forEach(id => {
         const el = $(id); if(el) el.style.color = dpTxt;
       });
+      // Link-Button Textfarbe
+      const dpLink = $('desktopPopupLink');
+      if(dpLink) dpLink.style.color = dpTxt;
       // Schließen-Button anpassen
       const dpClose = $('desktopPopupClose');
       if(dpClose) dpClose.style.color = dpTxt;
@@ -254,6 +257,8 @@
       ['mobilePopupTitle','mobilePopupMeta','mobilePopupNote'].forEach(id => {
         const el = $(id); if(el) el.style.color = mpTxt;
       });
+      const mpLink = $('mobilePopupLink');
+      if(mpLink) mpLink.style.color = mpTxt;
       // Bildbereich Hintergrund ebenfalls in Ortsfarbe
       const mi2 = $('mobilePopupImg');
       if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
