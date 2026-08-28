@@ -34,22 +34,10 @@
     return html;
   };
 
-  // Textfarbe je nach Helligkeit (schwarz oder weiß)
   const getTextColor = hex => {
     if(!hex || hex.length < 7) return '#ffffff';
-    const r = parseInt(hex.slice(1,3),16);
-    const g = parseInt(hex.slice(3,5),16);
-    const b = parseInt(hex.slice(5,7),16);
-    return (0.299*r + 0.587*g + 0.114*b) > 160 ? '#1a1a1a' : '#ffffff';
-  };
-
-  // Textfarbe je nach Helligkeit der Hintergrundfarbe
-  const getTextColor = hex => {
-    if(!hex || hex.length < 7) return '#ffffff';
-    const r = parseInt(hex.slice(1,3),16);
-    const g = parseInt(hex.slice(3,5),16);
-    const b = parseInt(hex.slice(5,7),16);
-    return (0.299*r + 0.587*g + 0.114*b) > 160 ? '#1a1a1a' : '#ffffff';
+    const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return (0.299*r+0.587*g+0.114*b)>160 ? '#1a1a1a' : '#ffffff';
   };
 
   const sanitizeUrl = url => { if(!url) return ''; try{return new URL(url).toString();}catch{return '';} };
@@ -225,8 +213,7 @@
       const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
       dp.style.borderColor = col;
       dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
-      const dpTextColor = getTextColor(col);
-      dp.style.color = dpTextColor;
+      dp.style.color = getTextColor(col);
       $('desktopPopupTitle').textContent = p.title;
       $('desktopPopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const dImg  = $('desktopPopupImg');
