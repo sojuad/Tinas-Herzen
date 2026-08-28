@@ -169,9 +169,9 @@
       const bg = p.color || DEFAULT_COLOR;
       card.className = 'card' + (p.id===selectedId?' selected':'');
       card.dataset.id = p.id;
-      card.style.background = bg;
-      card.style.borderLeft = 'none';
-      card.style.color = getTextColor(bg);
+      card.style.background = bg + '33';
+      card.style.borderLeft = `3px solid ${bg}`;
+      card.style.color = '#ffffff';
       card.style.cursor = 'pointer';
       card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
       card.addEventListener('click', () => { selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
@@ -211,7 +211,13 @@
       const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
       dp.style.borderColor = col;
       dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
-      dp.style.color = getTextColor(col);
+      const dpTxt = getTextColor(col);
+      ['desktopPopupTitle','desktopPopupMeta','desktopPopupNote','desktopPopupDate'].forEach(id => {
+        const el = $(id); if(el) el.style.color = dpTxt;
+      });
+      // Schließen-Button anpassen
+      const dpClose = $('desktopPopupClose');
+      if(dpClose) dpClose.style.color = dpTxt;
       $('desktopPopupTitle').textContent = p.title;
       $('desktopPopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const dImg  = $('desktopPopupImg');
@@ -244,7 +250,10 @@
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
       mp.style.background = `rgba(${r},${g},${b},0.15)`;
       mp.style.borderColor = c;
-      mp.style.color = getTextColor(c);
+      const mpTxt = getTextColor(c);
+      ['mobilePopupTitle','mobilePopupMeta','mobilePopupNote'].forEach(id => {
+        const el = $(id); if(el) el.style.color = mpTxt;
+      });
       // Bildbereich Hintergrund ebenfalls in Ortsfarbe
       const mi2 = $('mobilePopupImg');
       if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
