@@ -229,6 +229,7 @@
       if(p.note) {
         $('desktopPopupNote').innerHTML = renderNoteWithImages(p.note);
         $('desktopPopupNote').classList.remove('hidden');
+        $('desktopPopupNote').style.color = dpTxt;
       } else { $('desktopPopupNote').classList.add('hidden'); }
       const dLink   = $('desktopPopupLink');
       if(safeUrl) { dLink.style.display='inline-flex'; dLink.href=safeUrl; }
