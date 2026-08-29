@@ -68,8 +68,10 @@
   const positron = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', { maxZoom:20, attribution:'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
   const dark     = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom:20, attribution:'&copy; Stadia Maps &copy; OpenStreetMap' });
   const esri     = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Tiles &copy; Esri' });
+  const mapboxToken = 'pk.eyJ1Ijoic29qdWFkIiwiYSI6ImNtdGVuaXNkaTE0YmsyeHNja2ZmY2x4anoifQ.jKbuzhtotfsbFxTlgiwFLA';
+  const tinasDesign = L.tileLayer(`https://api.mapbox.com/styles/v1/sojuad/cmtepjjkf005j01qt8och4c6h/tiles/512/{z}/{x}/{y}{r}?access_token=${mapboxToken}`, { tileSize:512, zoomOffset:-1, detectRetina:true, maxZoom:22, attribution:'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
   positron.addTo(map);
-  L.control.layers({'Hell':positron,'Dunkel':dark,'Satellit':esri}, null, {position:'topleft'}).addTo(map);
+  L.control.layers({'Hell':positron,'Dunkel':dark,'Satellit':esri,'Tinas Design':tinasDesign}, null, {position:'topleft'}).addTo(map);
   const markersLayer = L.layerGroup().addTo(map);
   const markerById = new Map();
 
