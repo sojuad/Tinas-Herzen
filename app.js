@@ -72,23 +72,16 @@
   // Hinweis: Der Style basiert auf dem "Mapbox Standard"-Basemap-Import, den die klassische
   // Raster-Tiles-API nicht unterstützt (fehlende Beschriftungen). Daher hier echtes Mapbox GL
   // via des mapbox-gl-leaflet-Plugins, damit der Style 1:1 wie im Studio-Editor gerendert wird.
+  // Mapbox Standard rendert unter Zoom ~5 standardmäßig als 3D-Globus. Leaflet (und damit die
+  // Herz-Marker) rechnet aber immer in flacher Web-Mercator-Projektion – bei aktivem Globus
+  // stimmen die Herzpositionen dadurch nicht mehr. "projection:'mercator'" direkt beim Erstellen
+  // erzwingt die flache Ansicht von Anfang an (kostet den 3D-Globus-Look, s. Chat).
   const tinasDesign = L.mapboxGL({
     style: 'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h',
     accessToken: mapboxToken,
+    projection: 'mercator',
     attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
-  // Mapbox Standard rendert unter Zoom ~5 standardmäßig als 3D-Globus. Leaflet (und damit die
-  // Herz-Marker) rechnet aber immer in flacher Web-Mercator-Projektion – bei aktivem Globus
-  // stimmen die Herzpositionen dadurch nicht mehr. Daher hier fest auf flache Mercator-Projektion
-  // schalten, damit die Positionen exakt bleiben (kostet den 3D-Globus-Look, s. Chat).
-  const forceFlatProjection = () => {
-    const glMap = tinasDesign.getMapboxMap && tinasDesign.getMapboxMap();
-    if (!glMap) return;
-    if (glMap.isStyleLoaded && glMap.isStyleLoaded()) glMap.setProjection('mercator');
-    else glMap.once('load', () => glMap.setProjection('mercator'));
-  };
-  tinasDesign.on('load', forceFlatProjection);
-  map.on('baselayerchange', e => { if (e.layer === tinasDesign) forceFlatProjection(); });
   positron.addTo(map);
   L.control.layers({'Hell':positron,'Dunkel':dark,'Satellit':esri,'Tinas Design':tinasDesign}, null, {position:'topleft'}).addTo(map);
   const markersLayer = L.layerGroup().addTo(map);
