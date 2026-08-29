@@ -77,6 +77,18 @@
     accessToken: mapboxToken,
     attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
+  // Mapbox Standard rendert unter Zoom ~5 standardmäßig als 3D-Globus. Leaflet (und damit die
+  // Herz-Marker) rechnet aber immer in flacher Web-Mercator-Projektion – bei aktivem Globus
+  // stimmen die Herzpositionen dadurch nicht mehr. Daher hier fest auf flache Mercator-Projektion
+  // schalten, damit die Positionen exakt bleiben (kostet den 3D-Globus-Look, s. Chat).
+  const forceFlatProjection = () => {
+    const glMap = tinasDesign.getMapboxMap && tinasDesign.getMapboxMap();
+    if (!glMap) return;
+    if (glMap.isStyleLoaded && glMap.isStyleLoaded()) glMap.setProjection('mercator');
+    else glMap.once('load', () => glMap.setProjection('mercator'));
+  };
+  tinasDesign.on('load', forceFlatProjection);
+  map.on('baselayerchange', e => { if (e.layer === tinasDesign) forceFlatProjection(); });
   positron.addTo(map);
   L.control.layers({'Hell':positron,'Dunkel':dark,'Satellit':esri,'Tinas Design':tinasDesign}, null, {position:'topleft'}).addTo(map);
   const markersLayer = L.layerGroup().addTo(map);
