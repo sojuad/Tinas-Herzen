@@ -71,20 +71,37 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* ── MAP ── */
 .mapwrap{position:relative;}
 #map{height:100%;width:100%;}
-.leaflet-tile-pane{filter:brightness(0.75) saturate(1.2);}
+/* Raster-Basiskarten (Hell/Dunkel/Satellit) dunkler/satter einfärben – "Tinas Design" bleibt
+   unangetastet, deshalb per Klasse statt global (kein Leaflet-Tile-Pane mehr, ein GL-Canvas). */
+#map.raster-basemap .mapboxgl-canvas{filter:brightness(0.75) saturate(1.2);}
+
+/* ── Eigener Kartenstil-Umschalter (ersetzt Leaflets L.control.layers) ── */
+.layer-switch{position:relative;}
+.layer-switch-btn{width:29px;height:29px;background:#fff;border:none;cursor:pointer;font-size:15px;line-height:1;color:#333;display:flex;align-items:center;justify-content:center;}
+.layer-switch-btn:hover{background:#f2f2f2;}
+.layer-switch-menu{display:none;position:absolute;top:0;left:calc(100% + 6px);background:#fff;border-radius:6px;box-shadow:var(--shadow);padding:6px 12px;white-space:nowrap;}
+.layer-switch-menu.open{display:block;}
+.layer-switch-item{display:flex;align-items:center;gap:6px;font-size:13px;padding:4px 0;cursor:pointer;color:#222;font-family:'DM Sans',sans-serif;}
+.layer-switch-item input{cursor:pointer;}
 
 /* ── TOAST ── */
 .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:20px;background:rgba(17,22,38,0.95);border:1px solid rgba(255,255,255,0.15);padding:9px 16px;border-radius:10px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity 0.2s;font-size:13px;white-space:nowrap;z-index:500;color:#fff;}
 .toast.show{opacity:1;}
 
 /* ── HOVER TOOLTIP ── */
-/* .hovercard-wrap ist der Leaflet-Wrapper – kein eigenes Background, da inline gesetzt */
-.leaflet-tooltip.hovercard-wrap {
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+/* .hovercard-pos ist ein Kind-Element des Herz-Markers (Mapbox-GL-DOM-Marker) – bewegt sich
+   dadurch automatisch mit, ganz ohne Positions-Sync wie früher bei Leaflet. */
+.hovercard-pos {
+  position: absolute;
+  left: 50%; bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  opacity: 0; visibility: hidden;
+  pointer-events: none;
+  transition: opacity .12s ease;
+  z-index: 20;
 }
+.heart-marker.hover .hovercard-pos { opacity: 1; visibility: visible; }
 /* .hovercard bekommt den Hintergrund inline via JS (= Ort-Farbe) */
 .hovercard {
   border-radius: 14px;
@@ -118,8 +135,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .hovercard .hc-muted {
   display: none;
 }
-/* Leaflet Tooltip Arrow ausblenden */
-.leaflet-tooltip.hovercard-wrap::before { display: none; }
 
 
 /* ── DESKTOP POPUP (schwebt über der Karte beim Klick auf Herz) ── */
@@ -194,14 +209,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* ════════ MOBILE (≤768px) ════════ */
 
 /* ── Touch / iOS Safari Fixes ── */
-.leaflet-marker-icon {
+.heart-marker {
   cursor: pointer !important;
   pointer-events: all !important;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.leaflet-interactive {
-  cursor: pointer !important;
   touch-action: manipulation;
 }
 * { -webkit-tap-highlight-color: transparent; }
@@ -209,8 +220,7 @@ body { touch-action: manipulation; }
 
 /* Hover-Tooltip auf Touch-Geräten (Finger) komplett ausblenden */
 @media (pointer: coarse) {
-  .leaflet-tooltip.hovercard-wrap,
-  .leaflet-tooltip.hovercard {
+  .hovercard-pos {
     display: none !important;
   }
 }
@@ -284,8 +294,8 @@ body { touch-action: manipulation; }
   }
   #map { height: 100%; width: 100%; }
 
-  /* Leaflet Controls nicht vom Header versteckt */
-  .leaflet-top { top: 8px !important; }
+  /* Mapbox-GL-Controls nicht vom Header versteckt */
+  .mapboxgl-ctrl-top-left { top: 8px !important; }
 
   /* ── MOBILE HEADER ── */
   .mobile-header {
@@ -389,5 +399,5 @@ body { touch-action: manipulation; }
   .mobile-popup .smallbtn { margin: 0; }
 
   /* Hover-Tooltip auf Mobile deaktivieren */
-  .leaflet-tooltip.hovercard { display: none !important; }
+  .hovercard-pos { display: none !important; }
 }

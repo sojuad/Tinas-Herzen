@@ -63,28 +63,92 @@
 
   let allPlaces=[], activeCont='Alle', activeCountry='Alle', activeYear='Alle', searchQ='', selectedId=null;
 
-  // ── MAP ──────────────────────────────────────────────────────────
-  const map = L.map('map', {center:[20,10], zoom:2, worldCopyJump:true, preferCanvas:false});
-  const positron = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', { maxZoom:20, attribution:'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
-  const dark     = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', { maxZoom:20, attribution:'&copy; Stadia Maps &copy; OpenStreetMap' });
-  const esri     = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19, attribution:'Tiles &copy; Esri' });
+  // ── MAP (Mapbox GL JS – kein Leaflet mehr) ─────────────────────────
   const mapboxToken = 'pk.eyJ1Ijoic29qdWFkIiwiYSI6ImNtdGVuaXNkaTE0YmsyeHNja2ZmY2x4anoifQ.jKbuzhtotfsbFxTlgiwFLA';
-  // Hinweis: Der Style basiert auf dem "Mapbox Standard"-Basemap-Import, den die klassische
-  // Raster-Tiles-API nicht unterstützt (fehlende Beschriftungen). Daher hier echtes Mapbox GL
-  // via des mapbox-gl-leaflet-Plugins, damit der Style 1:1 wie im Studio-Editor gerendert wird.
-  // Mapbox Standard rendert unter Zoom ~5 standardmäßig als 3D-Globus. Leaflet (und damit die
-  // Herz-Marker) rechnet aber immer in flacher Web-Mercator-Projektion – bei aktivem Globus
-  // stimmen die Herzpositionen dadurch nicht mehr. "projection:'mercator'" direkt beim Erstellen
-  // erzwingt die flache Ansicht von Anfang an (kostet den 3D-Globus-Look, s. Chat).
-  const tinasDesign = L.mapboxGL({
-    style: 'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h',
-    accessToken: mapboxToken,
-    projection: 'mercator',
-    attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  mapboxgl.accessToken = mapboxToken;
+
+  const STADIA_ATTR = '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+  const rasterStyle = (id, tileUrl, attribution, maxzoom) => ({
+    version: 8,
+    sources: { [id]: { type:'raster', tiles:[tileUrl], tileSize:256, attribution, maxzoom } },
+    layers: [{ id: id+'-layer', type:'raster', source:id }]
   });
-  positron.addTo(map);
-  L.control.layers({'Hell':positron,'Dunkel':dark,'Satellit':esri,'Tinas Design':tinasDesign}, null, {position:'topleft'}).addTo(map);
-  const markersLayer = L.layerGroup().addTo(map);
+  // "Hell"/"Dunkel"/"Satellit" bleiben normale Raster-Tiles (schnell, kein GL nötig für sie selbst,
+  // aber alles läuft jetzt über dieselbe Mapbox-GL-Karteninstanz, damit "Tinas Design" ohne Bridge
+  // (kein mapbox-gl-leaflet mehr) nativ läuft – dadurch kein Zoom-Nachhinken mehr.
+  const STYLES = {
+    hell:     rasterStyle('hell',     'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png',      STADIA_ATTR, 20),
+    dunkel:   rasterStyle('dunkel',   'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', STADIA_ATTR, 20),
+    satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19),
+    tinas:    'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h'
+  };
+  const STYLE_LABELS = { hell:'Hell', dunkel:'Dunkel', satellit:'Satellit', tinas:'Tinas Design' };
+  const RASTER_KEYS = new Set(['hell','dunkel','satellit']);
+  let activeStyleKey = 'hell';
+
+  const mapEl = $('map');
+  const applyRasterFilterClass = key => mapEl.classList.toggle('raster-basemap', RASTER_KEYS.has(key));
+  applyRasterFilterClass(activeStyleKey);
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: STYLES[activeStyleKey],
+    center: [10, 20],
+    zoom: 2,
+    projection: 'mercator', // "Tinas Design" basiert auf Mapbox Standard, das unter Zoom ~5
+                            // sonst als 3D-Globus rendert – flach halten, damit Herzpositionen stimmen
+    attributionControl: false
+  });
+  map.dragRotate.disable();
+  map.touchPitch.disable();
+  map.addControl(new mapboxgl.AttributionControl({compact:true}));
+  map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-left');
+  // Falls ein Style (v. a. "Tinas Design") die flache Projektion nicht übernimmt, nach jedem
+  // Style-Wechsel zur Sicherheit erneut erzwingen.
+  map.on('style.load', () => map.setProjection('mercator'));
+
+  // ── Eigener Kartenstil-Umschalter (ersetzt Leaflets L.control.layers) ──
+  class LayerSwitchControl {
+    onAdd(mapInstance) {
+      this._map = mapInstance;
+      const el = document.createElement('div');
+      el.className = 'mapboxgl-ctrl mapboxgl-ctrl-group layer-switch';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'layer-switch-btn';
+      btn.setAttribute('aria-label', 'Kartenstil wählen');
+      btn.innerHTML = '&#9776;';
+      const menu = document.createElement('div');
+      menu.className = 'layer-switch-menu';
+      Object.keys(STYLES).forEach(key => {
+        const item = document.createElement('label');
+        item.className = 'layer-switch-item';
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'basestyle';
+        radio.value = key;
+        radio.checked = key === activeStyleKey;
+        radio.addEventListener('change', () => {
+          activeStyleKey = key;
+          applyRasterFilterClass(key);
+          this._map.setStyle(STYLES[key]);
+          menu.classList.remove('open');
+        });
+        item.appendChild(radio);
+        item.appendChild(document.createTextNode(' ' + STYLE_LABELS[key]));
+        menu.appendChild(item);
+      });
+      btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('open'); });
+      document.addEventListener('click', () => menu.classList.remove('open'));
+      el.appendChild(btn);
+      el.appendChild(menu);
+      this._container = el;
+      return el;
+    }
+    onRemove() { this._container.parentNode?.removeChild(this._container); }
+  }
+  map.addControl(new LayerSwitchControl(), 'top-left');
+
   const markerById = new Map();
 
   // ── FILTER ───────────────────────────────────────────────────────
@@ -116,59 +180,40 @@
     return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
   };
 
+  const isTouchDevice = () => navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
-  // ── HERZ-MARKER ──────────────────────────────────────────────────
-  function makeHeartIcon(color) {
-    const c = color || DEFAULT_COLOR;
-    // Vollflächig, 60% kleiner (30->12, 28->11), kein Rand
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 30 28">
+  // ── HERZ-MARKER (natives Mapbox-GL-DOM-Marker, kein Leaflet-Icon) ──
+  const makeHeartEl = p => {
+    const color = p.color || DEFAULT_COLOR;
+    const wrap = document.createElement('div');
+    wrap.className = 'heart-marker';
+    wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 30 28">
       <path d="M15 25.5C15 25.5 2 17 2 8.5C2 5 4.5 2 8 2C11 2 13.5 3.8 15 6.2C16.5 3.8 19 2 22 2C25.5 2 28 5 28 8.5C28 17 15 25.5 15 25.5Z"
-        fill="${c}" stroke="none"/>
+        fill="${color}" stroke="none"/>
     </svg>`;
-    return L.divIcon({
-      html: svg,
-      className: '',
-      iconSize: [18, 17],
-      iconAnchor: [9, 15],
-      tooltipAnchor: [0, -17]
+    const hoverWrap = document.createElement('div');
+    hoverWrap.className = 'hovercard-pos';
+    hoverWrap.innerHTML = makeHoverHtml(p);
+    wrap.appendChild(hoverWrap);
+
+    wrap.addEventListener('mouseenter', () => { if(!isTouchDevice()) wrap.classList.add('hover'); });
+    wrap.addEventListener('mouseleave', () => wrap.classList.remove('hover'));
+    wrap.addEventListener('click', e => {
+      e.stopPropagation();
+      wrap.classList.remove('hover');
+      selectPlace(p.id);
     });
-  }
+    return wrap;
+  };
 
   // ── MARKERS ──────────────────────────────────────────────────────
   const renderMarkers = src => {
-    markersLayer.clearLayers(); markerById.clear();
+    markerById.forEach(m => m.remove());
+    markerById.clear();
     src.forEach(p => {
-      const marker = L.marker([p.lat, p.lng], {icon: makeHeartIcon(p.color), interactive: true, bubblingMouseEvents: false});
-      marker.bindTooltip(makeHoverHtml(p), {direction:'top', offset:[0,-8], opacity:1, className:'hovercard-wrap', sticky:false});
-      // Touch-Erkennung (iOS + Android)
-      const isTouchDevice = () => navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
-      const isMobile = () => window.innerWidth <= 768;
-
-      // Hover-Tooltip nur auf echten Desktop-Mäusen
-      marker.on('mouseover', () => {
-        if(!isTouchDevice()) marker.openTooltip();
-      });
-      marker.on('mouseout', () => {
-        if(!isTouchDevice()) marker.closeTooltip();
-      });
-
-      // Touch: touchstart merken, touchend auslösen – verhindert Doppel-Firing mit click
-      let touchStarted = false;
-      marker.on('touchstart', () => { touchStarted = true; });
-      marker.on('touchend', e => {
-        if(e.originalEvent) e.originalEvent.preventDefault();
-        e.originalEvent && e.originalEvent.stopPropagation();
-        marker.closeTooltip();
-        selectPlace(p.id);
-        touchStarted = false;
-      });
-      // Click nur auf Desktop (nicht nach Touch)
-      marker.on('click', e => {
-        if(touchStarted) { touchStarted = false; return; }
-        marker.closeTooltip();
-        selectPlace(p.id);
-      });
-      marker.addTo(markersLayer);
+      const marker = new mapboxgl.Marker({ element: makeHeartEl(p), anchor: 'bottom' })
+        .setLngLat([p.lng, p.lat])
+        .addTo(map);
       markerById.set(p.id, marker);
     });
   };
@@ -188,7 +233,10 @@
       card.style.color = '#ffffff';
       card.style.cursor = 'pointer';
       card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
-      card.addEventListener('click', () => { selectPlace(p.id); map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),7), {duration:0.8}); });
+      card.addEventListener('click', () => {
+        selectPlace(p.id);
+        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 800 });
+      });
       listEl.appendChild(card);
     });
   };
@@ -200,9 +248,9 @@
     selectedId = null;
     document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
   });
-  // Klick auf Karte schließt Popup
-  document.getElementById('map')?.addEventListener('click', e => {
-    if(!e.target.closest('.leaflet-marker-icon')) {
+  // Klick auf Karte schließt Popup (außer Klick war auf ein Herz)
+  mapEl.addEventListener('click', e => {
+    if(!e.target.closest('.heart-marker')) {
       $('desktopPopup')?.classList.add('hidden');
     }
   });
