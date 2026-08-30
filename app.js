@@ -81,15 +81,20 @@
     tinas:    'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h',
     hell:     rasterStyle('hell', 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', STADIA_ATTR, 20),
     dunkel:   'https://tiles.openfreemap.org/styles/dark',
-    satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19)
+    satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19),
+    // Zusätzliche 5. Karte: Mapboxs eigener "Standard"-Stil mit Nacht-Beleuchtung (lightPreset
+    // 'night') – dynamische Beleuchtung, leuchtende Fenster an 3D-Gebäuden bei nahem Zoom.
+    nacht:    'mapbox://styles/mapbox/standard'
   };
-  const STYLE_LABELS = { tinas:'Tinas Herzen', hell:'Hell', dunkel:'Dunkel', satellit:'Satellit' };
+  const STYLE_LABELS = { tinas:'Tinas Herzen', hell:'Hell', dunkel:'Dunkel', satellit:'Satellit', nacht:'Nacht' };
+  const GLOBE_KEYS = new Set(['tinas', 'nacht']);
   let activeStyleKey = 'tinas';
 
   const mapEl = $('map');
 
-  // Projektion pro Kartenstil: "Tinas Herzen" als 3D-Globus, alle anderen Stile flach.
-  const projectionForStyle = key => key === 'tinas' ? 'globe' : 'mercator';
+  // Projektion pro Kartenstil: "Tinas Herzen" und "Nacht" (beide Mapbox Standard) als 3D-Globus,
+  // alle anderen Stile flach.
+  const projectionForStyle = key => GLOBE_KEYS.has(key) ? 'globe' : 'mercator';
 
   const map = new mapboxgl.Map({
     container: 'map',
@@ -106,8 +111,14 @@
   map.dragRotate.disable();
   map.touchPitch.disable();
   // Nach jedem Stilwechsel (setStyle setzt die Projektion sonst auf den Style-Default zurück)
-  // erneut die passende Projektion erzwingen.
-  map.on('style.load', () => map.setProjection(projectionForStyle(activeStyleKey)));
+  // erneut die passende Projektion erzwingen. Für "Nacht" zusätzlich den Beleuchtungsmodus des
+  // Mapbox-Standard-Stils auf 'night' setzen.
+  map.on('style.load', () => {
+    map.setProjection(projectionForStyle(activeStyleKey));
+    if (activeStyleKey === 'nacht') {
+      map.setConfigProperty('basemap', 'lightPreset', 'night');
+    }
+  });
   map.addControl(new mapboxgl.AttributionControl({compact:true}));
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-left');
 
