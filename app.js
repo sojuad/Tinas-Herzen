@@ -242,7 +242,9 @@
       card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
       card.addEventListener('click', () => {
         selectPlace(p.id);
-        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 800 });
+        // essential:true erzwingt die Animation, auch wenn im System "Bewegung reduzieren"
+        // aktiv ist – sonst überspringt Mapbox GL flyTo() und springt sofort ohne Flug.
+        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 800, essential: true });
       });
       listEl.appendChild(card);
     });
