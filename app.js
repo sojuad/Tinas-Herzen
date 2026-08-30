@@ -175,7 +175,7 @@
     const title = escHtml(p.title);
     const sub   = escHtml([p.country, p.continent].filter(Boolean).join(' · '));
     const txtCol = getTextColor(color);
-    const style = `style="background:${color}ee;border-color:${color};color:${txtCol};"`;
+    const style = `style="background:${color};border-color:${color};color:${txtCol};"`;
     if(!photo) return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><div class="hc-muted">${sub}</div></div>`;
     return `<div class="hovercard" ${style}><div class="hc-title">${title}</div><img src="${photo}" alt=""/><div class="hc-muted">${sub}</div></div>`;
   };
@@ -281,7 +281,7 @@
       const col = p.color || DEFAULT_COLOR;
       const pr = parseInt(col.slice(1,3),16), pg = parseInt(col.slice(3,5),16), pb = parseInt(col.slice(5,7),16);
       dp.style.borderColor = col;
-      dp.style.background  = `rgba(${pr},${pg},${pb},0.92)`;
+      dp.style.background  = `rgba(${pr},${pg},${pb},1)`;
       const dpTxt = getTextColor(col);
       ['desktopPopupTitle','desktopPopupMeta','desktopPopupNote','desktopPopupDate'].forEach(id => {
         const el = $(id); if(el) el.style.color = dpTxt;
@@ -323,7 +323,7 @@
       // Hintergrund + Border in der Ortsfarbe
       const c = p.color || DEFAULT_COLOR;
       const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
-      mp.style.background = `rgba(${r},${g},${b},0.15)`;
+      mp.style.background = `rgba(${r},${g},${b},1)`;
       mp.style.borderColor = c;
       const mpTxt = getTextColor(c);
       ['mobilePopupTitle','mobilePopupMeta','mobilePopupNote'].forEach(id => {
@@ -333,7 +333,7 @@
       if(mpLink) mpLink.style.color = mpTxt;
       // Bildbereich Hintergrund ebenfalls in Ortsfarbe
       const mi2 = $('mobilePopupImg');
-      if(mi2) mi2.style.background = `rgba(${r},${g},${b},0.2)`;
+      if(mi2) mi2.style.background = `rgba(${r},${g},${b},1)`;
       $('mobilePopupTitle').textContent = p.title;
       $('mobilePopupMeta').textContent  = `${toCoord(p.lat)}, ${toCoord(p.lng)}  ·  ${[p.country,p.continent].filter(Boolean).join(' · ')}`;
       const mi = $('mobilePopupImg');
