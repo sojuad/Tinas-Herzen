@@ -244,7 +244,7 @@
         selectPlace(p.id);
         // essential:true erzwingt die Animation, auch wenn im System "Bewegung reduzieren"
         // aktiv ist – sonst überspringt Mapbox GL flyTo() und springt sofort ohne Flug.
-        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 800, essential: true });
+        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 2000, essential: true });
       });
       listEl.appendChild(card);
     });
