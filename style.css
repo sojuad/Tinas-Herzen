@@ -7,6 +7,12 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);}
+/* Mapbox GL bringt über mapbox-gl.css eine eigene Standard-Schriftart für alles innerhalb der
+   Karte mit (Controls, Popups, und auch unsere Marker/Hover-Karten, da sie als Kind-Elemente in
+   den Karten-Container gerendert werden) – das überschreibt sonst unser Roboto nur dort. */
+#map, .mapboxgl-map, .mapboxgl-ctrl, .mapboxgl-popup, .mapboxgl-marker {
+  font-family: 'Roboto', sans-serif;
+}
 
 /* ── DESKTOP LAYOUT ── */
 .mobile-header,.mobile-filter-panel,.mobile-popup{display:none;}
