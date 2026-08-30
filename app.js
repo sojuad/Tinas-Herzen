@@ -92,19 +92,26 @@
   const applyRasterFilterClass = key => mapEl.classList.toggle('raster-basemap', RASTER_KEYS.has(key));
   applyRasterFilterClass(activeStyleKey);
 
+  // Projektion pro Kartenstil: "Tinas Herzen" als 3D-Globus, alle anderen Stile flach.
+  const projectionForStyle = key => key === 'tinas' ? 'globe' : 'mercator';
+
   const map = new mapboxgl.Map({
     container: 'map',
     style: STYLES[activeStyleKey],
     center: [10, 20],
     zoom: 2,
-    // Keine feste Projektion mehr erzwingen: "Tinas Herzen" (Mapbox Standard) darf jetzt wieder
-    // als 3D-Globus starten, Hell/Dunkel/Satellit bleiben flach (ihr eigener Style-Default).
-    // Die Herzen sind native Mapbox-GL-Marker (nicht mehr Leaflet), die die Kugel-Projektion
-    // selbst korrekt mitrechnen – anders als früher über die Leaflet-Bridge.
+    // Projektion wird explizit gesetzt (nicht mehr dem Style-Default überlassen), damit der
+    // Globus bei "Tinas Herzen" garantiert erscheint – unabhängig davon, was im Studio-Style
+    // hinterlegt ist. Die Herzen sind native Mapbox-GL-Marker (nicht mehr Leaflet), die die
+    // Kugel-Projektion selbst korrekt mitrechnen – anders als früher über die Leaflet-Bridge.
+    projection: projectionForStyle(activeStyleKey),
     attributionControl: false
   });
   map.dragRotate.disable();
   map.touchPitch.disable();
+  // Nach jedem Stilwechsel (setStyle setzt die Projektion sonst auf den Style-Default zurück)
+  // erneut die passende Projektion erzwingen.
+  map.on('style.load', () => map.setProjection(projectionForStyle(activeStyleKey)));
   map.addControl(new mapboxgl.AttributionControl({compact:true}));
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-left');
 
