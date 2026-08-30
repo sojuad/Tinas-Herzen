@@ -124,9 +124,9 @@
       // Marineblau/Schwarz gedämpft, damit der Globus nicht so "blau" wirkt.
       map.setFog({
         range: [0.5, 10],
-        color: '#ffffff',
+        color: 'rgba(255,255,255,0.55)',
         'high-color': '#182a3d',
-        'horizon-blend': 0.1,
+        'horizon-blend': 0.04,
         'space-color': '#02060f',
         'star-intensity': 0.15
       });
