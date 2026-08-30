@@ -193,10 +193,17 @@
     </svg>`;
     const hoverWrap = document.createElement('div');
     hoverWrap.className = 'hovercard-pos';
-    hoverWrap.innerHTML = makeHoverHtml(p);
     wrap.appendChild(hoverWrap);
+    // Inhalt (inkl. Foto) erst beim ersten Hover bauen – sonst laden alle 149 Herzen sofort
+    // ihr Google-Drive-Foto im Hintergrund, auch ungehovert (das machte Mobile langsam).
+    let hoverBuilt = false;
+    const ensureHoverContent = () => {
+      if(hoverBuilt) return;
+      hoverWrap.innerHTML = makeHoverHtml(p);
+      hoverBuilt = true;
+    };
 
-    wrap.addEventListener('mouseenter', () => { if(!isTouchDevice()) wrap.classList.add('hover'); });
+    wrap.addEventListener('mouseenter', () => { if(!isTouchDevice()) { ensureHoverContent(); wrap.classList.add('hover'); } });
     wrap.addEventListener('mouseleave', () => wrap.classList.remove('hover'));
     wrap.addEventListener('click', e => {
       e.stopPropagation();

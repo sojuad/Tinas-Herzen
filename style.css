@@ -92,16 +92,18 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* .hovercard-pos ist ein Kind-Element des Herz-Markers (Mapbox-GL-DOM-Marker) – bewegt sich
    dadurch automatisch mit, ganz ohne Positions-Sync wie früher bei Leaflet. */
 .hovercard-pos {
+  display: none;
   position: absolute;
   left: 50%; bottom: 100%;
   transform: translateX(-50%);
   margin-bottom: 8px;
-  opacity: 0; visibility: hidden;
   pointer-events: none;
-  transition: opacity .12s ease;
   z-index: 20;
 }
-.heart-marker.hover .hovercard-pos { opacity: 1; visibility: visible; }
+.heart-marker.hover .hovercard-pos { display: block; }
+/* Mapbox GL vergibt jedem Marker einen eigenen z-index (nach Position) – beim Hovern den ganzen
+   Marker (inkl. Hover-Kärtchen) nach vorne holen, sonst können Nachbar-Herzen davorliegen. */
+.heart-marker.hover { z-index: 9999 !important; }
 /* .hovercard bekommt den Hintergrund inline via JS (= Ort-Farbe) */
 .hovercard {
   border-radius: 14px;
