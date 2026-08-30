@@ -118,6 +118,19 @@
     if (activeStyleKey === 'nacht') {
       map.setConfigProperty('basemap', 'lightPreset', 'night');
     }
+    if (activeStyleKey === 'tinas') {
+      // Der Standard-"Weltraum"-Hintergrund von Mapbox GL JS wird beim Herauszoomen kräftig
+      // blau (Style-Default space-color geht Richtung #367ab9) – hier auf dezentes Dunkel-
+      // Marineblau/Schwarz gedämpft, damit der Globus nicht so "blau" wirkt.
+      map.setFog({
+        range: [0.5, 10],
+        color: '#ffffff',
+        'high-color': '#182a3d',
+        'horizon-blend': 0.1,
+        'space-color': '#02060f',
+        'star-intensity': 0.15
+      });
+    }
   });
   map.addControl(new mapboxgl.AttributionControl({compact:true}));
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-left');
