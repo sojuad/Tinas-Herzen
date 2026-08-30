@@ -144,7 +144,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   position: absolute;
   top: 20px; right: 20px;
   width: min(420px, calc(100vw - 180px));
-  background: rgba(17,22,38,0.97);
+  background: rgb(17,22,38);
   border: 2px solid var(--border);
   border-radius: 18px;
   padding: 16px;
@@ -356,7 +356,7 @@ body { touch-action: manipulation; }
     /* Höher positionieren damit Browser-Tableleiste nicht überlappt */
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     left: 12px; right: 12px;
-    background: rgba(17,22,38,0.6);
+    background: rgb(17,22,38);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 18px;
     padding: 10px 12px 10px 12px;

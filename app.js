@@ -67,24 +67,26 @@
   const mapboxToken = 'pk.eyJ1Ijoic29qdWFkIiwiYSI6ImNtdGVuaXNkaTE0YmsyeHNja2ZmY2x4anoifQ.jKbuzhtotfsbFxTlgiwFLA';
   mapboxgl.accessToken = mapboxToken;
 
-  const STADIA_ATTR = '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
   const rasterStyle = (id, tileUrl, attribution, maxzoom) => ({
     version: 8,
     sources: { [id]: { type:'raster', tiles:[tileUrl], tileSize:256, attribution, maxzoom } },
     layers: [{ id: id+'-layer', type:'raster', source:id }]
   });
-  // "Hell"/"Dunkel"/"Satellit" bleiben normale Raster-Tiles (schnell, kein GL nötig für sie selbst,
-  // aber alles läuft jetzt über dieselbe Mapbox-GL-Karteninstanz, damit "Tinas Design" ohne Bridge
-  // (kein mapbox-gl-leaflet mehr) nativ läuft – dadurch kein Zoom-Nachhinken mehr.
+  // "Hell"/"Dunkel" sind jetzt fertige kostenlose Vektor-Styles (OpenFreeMap: Positron/Dark) statt
+  // Stadia-Raster-Tiles. "Satellit" bleibt Esri-Raster. "Tinas Herzen" bleibt dein eigener
+  // Mapbox-Studio-Style und ist jetzt die Standardkarte beim Laden. Alles läuft weiter über eine
+  // einzige native Mapbox-GL-Karteninstanz (kein Leaflet, keine Bridge, kein Zoom-Nachhinken).
   const STYLES = {
-    hell:     rasterStyle('hell',     'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png',      STADIA_ATTR, 20),
-    dunkel:   rasterStyle('dunkel',   'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png', STADIA_ATTR, 20),
-    satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19),
-    tinas:    'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h'
+    tinas:    'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h',
+    hell:     'https://tiles.openfreemap.org/styles/positron',
+    dunkel:   'https://tiles.openfreemap.org/styles/dark',
+    satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19)
   };
-  const STYLE_LABELS = { hell:'Hell', dunkel:'Dunkel', satellit:'Satellit', tinas:'Tinas Design' };
-  const RASTER_KEYS = new Set(['hell','dunkel','satellit']);
-  let activeStyleKey = 'hell';
+  const STYLE_LABELS = { tinas:'Tinas Herzen', hell:'Hell', dunkel:'Dunkel', satellit:'Satellit' };
+  // Der Dunkler/Sättiger-Filter passt nur noch zu Esri-Satellitenbildern – Positron/Dark sind
+  // fertig designte Styles, die nicht zusätzlich nachbearbeitet werden sollen.
+  const RASTER_KEYS = new Set(['satellit']);
+  let activeStyleKey = 'tinas';
 
   const mapEl = $('map');
   const applyRasterFilterClass = key => mapEl.classList.toggle('raster-basemap', RASTER_KEYS.has(key));
@@ -95,17 +97,16 @@
     style: STYLES[activeStyleKey],
     center: [10, 20],
     zoom: 2,
-    projection: 'mercator', // "Tinas Design" basiert auf Mapbox Standard, das unter Zoom ~5
-                            // sonst als 3D-Globus rendert – flach halten, damit Herzpositionen stimmen
+    // Keine feste Projektion mehr erzwingen: "Tinas Herzen" (Mapbox Standard) darf jetzt wieder
+    // als 3D-Globus starten, Hell/Dunkel/Satellit bleiben flach (ihr eigener Style-Default).
+    // Die Herzen sind native Mapbox-GL-Marker (nicht mehr Leaflet), die die Kugel-Projektion
+    // selbst korrekt mitrechnen – anders als früher über die Leaflet-Bridge.
     attributionControl: false
   });
   map.dragRotate.disable();
   map.touchPitch.disable();
   map.addControl(new mapboxgl.AttributionControl({compact:true}));
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-left');
-  // Falls ein Style (v. a. "Tinas Design") die flache Projektion nicht übernimmt, nach jedem
-  // Style-Wechsel zur Sicherheit erneut erzwingen.
-  map.on('style.load', () => map.setProjection('mercator'));
 
   // ── Eigener Kartenstil-Umschalter (ersetzt Leaflets L.control.layers) ──
   class LayerSwitchControl {
