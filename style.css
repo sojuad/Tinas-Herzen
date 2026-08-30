@@ -71,9 +71,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* ── MAP ── */
 .mapwrap{position:relative;}
 #map{height:100%;width:100%;}
-/* Raster-Basiskarten (Hell/Dunkel/Satellit) dunkler/satter einfärben – "Tinas Design" bleibt
-   unangetastet, deshalb per Klasse statt global (kein Leaflet-Tile-Pane mehr, ein GL-Canvas). */
-#map.raster-basemap .mapboxgl-canvas{filter:brightness(0.75) saturate(1.2);}
 
 /* ── Eigener Kartenstil-Umschalter (ersetzt Leaflets L.control.layers) ── */
 .layer-switch{position:relative;}

@@ -72,25 +72,21 @@
     sources: { [id]: { type:'raster', tiles:[tileUrl], tileSize:256, attribution, maxzoom } },
     layers: [{ id: id+'-layer', type:'raster', source:id }]
   });
-  // "Hell"/"Dunkel" sind jetzt fertige kostenlose Vektor-Styles (OpenFreeMap: Positron/Dark) statt
-  // Stadia-Raster-Tiles. "Satellit" bleibt Esri-Raster. "Tinas Herzen" bleibt dein eigener
-  // Mapbox-Studio-Style und ist jetzt die Standardkarte beim Laden. Alles läuft weiter über eine
-  // einzige native Mapbox-GL-Karteninstanz (kein Leaflet, keine Bridge, kein Zoom-Nachhinken).
+  const STADIA_ATTR = '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+  // "Hell" ist wieder der vertraute Stadia-Alidade-Smooth-Stil (wie in V26/27), "Dunkel" bleibt der
+  // kostenlose OpenFreeMap-Vektor-Stil. "Satellit" bleibt Esri-Raster, jetzt ohne Nachbearbeitungs-
+  // Filter (naturgetreue Farben). "Tinas Herzen" bleibt dein eigener Mapbox-Studio-Style und ist die
+  // Standardkarte beim Laden. Alles läuft über eine einzige native Mapbox-GL-Karteninstanz.
   const STYLES = {
     tinas:    'mapbox://styles/sojuad/cmtepjjkf005j01qt8och4c6h',
-    hell:     'https://tiles.openfreemap.org/styles/positron',
+    hell:     rasterStyle('hell', 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png', STADIA_ATTR, 20),
     dunkel:   'https://tiles.openfreemap.org/styles/dark',
     satellit: rasterStyle('satellit', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Tiles &copy; Esri', 19)
   };
   const STYLE_LABELS = { tinas:'Tinas Herzen', hell:'Hell', dunkel:'Dunkel', satellit:'Satellit' };
-  // Der Dunkler/Sättiger-Filter passt nur noch zu Esri-Satellitenbildern – Positron/Dark sind
-  // fertig designte Styles, die nicht zusätzlich nachbearbeitet werden sollen.
-  const RASTER_KEYS = new Set(['satellit']);
   let activeStyleKey = 'tinas';
 
   const mapEl = $('map');
-  const applyRasterFilterClass = key => mapEl.classList.toggle('raster-basemap', RASTER_KEYS.has(key));
-  applyRasterFilterClass(activeStyleKey);
 
   // Projektion pro Kartenstil: "Tinas Herzen" als 3D-Globus, alle anderen Stile flach.
   const projectionForStyle = key => key === 'tinas' ? 'globe' : 'mercator';
@@ -138,7 +134,6 @@
         radio.checked = key === activeStyleKey;
         radio.addEventListener('change', () => {
           activeStyleKey = key;
-          applyRasterFilterClass(key);
           this._map.setStyle(STYLES[key]);
           menu.classList.remove('open');
         });
@@ -252,7 +247,7 @@
         selectPlace(p.id);
         // essential:true erzwingt die Animation, auch wenn im System "Bewegung reduzieren"
         // aktiv ist – sonst überspringt Mapbox GL flyTo() und springt sofort ohne Flug.
-        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 2000, essential: true });
+        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 4000, essential: true });
       });
       listEl.appendChild(card);
     });
