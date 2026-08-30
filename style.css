@@ -146,7 +146,7 @@ html,body{height:100%;font-family:'Roboto',sans-serif;background:var(--bg);color
 .desktop-popup {
   position: absolute;
   top: 20px; right: 20px;
-  width: min(420px, calc(100vw - 180px));
+  width: min(480px, calc(100vw - 140px));
   background: rgb(17,22,38);
   border: 2px solid var(--border);
   border-radius: 18px;
@@ -177,7 +177,7 @@ html,body{height:100%;font-family:'Roboto',sans-serif;background:var(--bg);color
 }
 .desktop-popup-img {
   width: 100%; height: auto;
-  max-height: 260px; object-fit: contain;
+  max-height: 420px; object-fit: contain;
   border-radius: 10px; display: block;
   margin-bottom: 10px; background: rgba(255,255,255,0.05);
 }
@@ -246,7 +246,7 @@ body { touch-action: manipulation; }
 .note-img {
   width: 100%;
   height: auto;
-  max-height: 200px;
+  max-height: 340px;
   object-fit: contain;
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.15);
