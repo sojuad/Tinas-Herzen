@@ -1,17 +1,17 @@
 [
   {
-    "id": "p_4f7660cfa07d38_1a04d8207eb",
-    "title": "Andrea und Stefans Herz in Skagen",
+    "id": "p_63e4c34949eb8_1a0535491ef",
+    "title": "Andrea und Stefans Herz in Brännö",
     "continent": "Europa",
-    "country": "Dänemark",
-    "color": "#192a56",
-    "date": "2026-08-29",
-    "lat": 57.74847,
-    "lng": 10.654621,
-    "url": "https://www.visitdenmark.de/daenemark/regionen/juetland/skagen",
-    "photo": "https://drive.google.com/file/d/1iSetSqxQp0LLs5Uh3QShmy1aki-UltE6/view?usp=sharing",
-    "note": "Andrea und Stefans Herz in Skagen https://drive.google.com/file/d/11rn3JTj1oRhb_kkM1kxG2ImZF5F3so-r/view?usp=sharing",
-    "createdAt": "2026-08-29T12:32:42.475Z"
+    "country": "Schweden",
+    "color": "#1976d2",
+    "date": "2026-08-30",
+    "lat": 57.648567,
+    "lng": 11.785361,
+    "url": "https://www.vastsverige.com/de/sehen-und-erleben/schwedens-westkuste-mit-dem-boot-erleben/ausspannen-auf-branno-eine-tagestour-ab-goteborg/",
+    "photo": "https://drive.google.com/file/d/1KLo-KK8TkUAKuumoppLn2Y10iByFO92w/view?usp=sharing",
+    "note": "Andrea und Stefans Herz in Brännö",
+    "createdAt": "2026-08-30T15:40:46.447Z"
   },
   {
     "id": "p_441ed5dcf2b968_1a04d8207eb",
@@ -25,6 +25,20 @@
     "url": "https://www.sylt.de/",
     "photo": "https://drive.google.com/file/d/19hFrHeDFQHIB72rOCLIwxBrQKa6aVBNL/view?usp=sharing",
     "note": "Katrin und Isas Herz auf Sylt https://drive.google.com/file/d/1fTJ6hSCJQbOORllLUp__sJdQwDkbWGLN/view?usp=sharing https://drive.google.com/file/d/1zBQH5LALj28CPiXoHpRZuK7z65BqB23f/view?usp=sharing",
+    "createdAt": "2026-08-29T12:32:42.475Z"
+  },
+  {
+    "id": "p_4f7660cfa07d38_1a04d8207eb",
+    "title": "Andrea und Stefans Herz in Skagen",
+    "continent": "Europa",
+    "country": "Dänemark",
+    "color": "#192a56",
+    "date": "2026-08-29",
+    "lat": 57.74847,
+    "lng": 10.654621,
+    "url": "https://www.visitdenmark.de/daenemark/regionen/juetland/skagen",
+    "photo": "https://drive.google.com/file/d/1iSetSqxQp0LLs5Uh3QShmy1aki-UltE6/view?usp=sharing",
+    "note": "Andrea und Stefans Herz in Skagen https://drive.google.com/file/d/11rn3JTj1oRhb_kkM1kxG2ImZF5F3so-r/view?usp=sharing",
     "createdAt": "2026-08-29T12:32:42.475Z"
   },
   {
