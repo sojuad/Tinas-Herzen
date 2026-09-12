@@ -193,7 +193,11 @@
   const getYear = p => (p.date && p.date.length >= 4) ? p.date.substring(0,4) : '';
 
   const renderAll = () => { const src=filtered(); renderList(src); renderMarkers(src); updateCount(src.length); };
-  const updateCount = n => { $('countBar').innerHTML = `<b>${n}</b> Ort${n!==1?'e':''} gefunden`; };
+  const updateCount = n => {
+    const txt = `<b>${n}</b> Ort${n!==1?'e':''} gefunden`;
+    $('countBar').innerHTML = txt;
+    const mc = $('mobileListCount'); if(mc) mc.innerHTML = txt;
+  };
 
   // ── HOVER TOOLTIP – Farbe als Hintergrund, Bild ungecroppt ───────
   const makeHoverHtml = p => {
@@ -253,27 +257,42 @@
   };
 
   // ── LIST ─────────────────────────────────────────────────────────
+  // Wird in ZWEI Containern gerendert: die Desktop-Sidebar-Liste (#list) und
+  // die mobile Vollbild-Liste (#mobileList, per Button im Mobile-Header
+  // erreichbar) – beide zeigen dieselben Orte und Klick-Verhalten.
   const listEl = $('list');
+  const mobileListEl = $('mobileList');
+  const makeCard = p => {
+    const card = document.createElement('div');
+    const bg = p.color || DEFAULT_COLOR;
+    card.className = 'card' + (p.id===selectedId?' selected':'');
+    card.dataset.id = p.id;
+    card.style.background = bg + '33';
+    card.style.borderLeft = `3px solid ${bg}`;
+    card.style.color = '#ffffff';
+    card.style.cursor = 'pointer';
+    card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
+    card.addEventListener('click', () => {
+      selectPlace(p.id);
+      // essential:true erzwingt die Animation, auch wenn im System "Bewegung reduzieren"
+      // aktiv ist – sonst überspringt Mapbox GL flyTo() und springt sofort ohne Flug.
+      map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 4000, essential: true });
+      closeMobileList();
+    });
+    return card;
+  };
   const renderList = src => {
     listEl.innerHTML = '';
-    if(!src.length) { listEl.innerHTML = `<div class="empty">Keine Orte gefunden.</div>`; return; }
+    if(mobileListEl) mobileListEl.innerHTML = '';
+    if(!src.length) {
+      const emptyHtml = `<div class="empty">Keine Orte gefunden.</div>`;
+      listEl.innerHTML = emptyHtml;
+      if(mobileListEl) mobileListEl.innerHTML = emptyHtml;
+      return;
+    }
     src.forEach(p => {
-      const card = document.createElement('div');
-      const bg = p.color || DEFAULT_COLOR;
-      card.className = 'card' + (p.id===selectedId?' selected':'');
-      card.dataset.id = p.id;
-      card.style.background = bg + '33';
-      card.style.borderLeft = `3px solid ${bg}`;
-      card.style.color = '#ffffff';
-      card.style.cursor = 'pointer';
-      card.innerHTML = `<div class="card-title">${escHtml(p.title)}</div>`;
-      card.addEventListener('click', () => {
-        selectPlace(p.id);
-        // essential:true erzwingt die Animation, auch wenn im System "Bewegung reduzieren"
-        // aktiv ist – sonst überspringt Mapbox GL flyTo() und springt sofort ohne Flug.
-        map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 4000, essential: true });
-      });
-      listEl.appendChild(card);
+      listEl.appendChild(makeCard(p));
+      if(mobileListEl) mobileListEl.appendChild(makeCard(p));
     });
   };
 
@@ -295,6 +314,7 @@
     selectedId = id;
     document.querySelectorAll('.card').forEach(c => c.classList.toggle('selected', c.dataset.id===id));
     listEl.querySelector(`[data-id="${id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
+    mobileListEl?.querySelector(`[data-id="${id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
     const p = allPlaces.find(x => x.id===id);
     if(!p) { $('desktopPopup')?.classList.add('hidden'); return; }
 
@@ -428,6 +448,7 @@
     mobileFilterOverlay?.classList.add('open');
     // Popup schließen wenn Filter aufgeht
     $('mobilePopup')?.classList.add('hidden');
+    closeMobileList();
   }
   function closeMobileFilter() {
     mobileFilterPanel?.classList.remove('open');
@@ -444,6 +465,30 @@
 
   // Chip-Klick schließt Filter automatisch
   // (wird in buildMobileChips gehandelt – closeMobileFilter ist global verfügbar)
+
+  // ── MOBILE LISTE – öffnen/schließen ─────────────────────────────
+  const mobileListBtn = $('mobileListBtn');
+  const mobileListPanel = $('mobileListPanel');
+  const mobileListOverlay = $('mobileListOverlay');
+
+  function openMobileList() {
+    mobileListPanel?.classList.add('open');
+    mobileListBtn?.classList.add('open');
+    mobileListOverlay?.classList.add('open');
+    $('mobilePopup')?.classList.add('hidden');
+    closeMobileFilter();
+  }
+  function closeMobileList() {
+    mobileListPanel?.classList.remove('open');
+    mobileListBtn?.classList.remove('open');
+    mobileListOverlay?.classList.remove('open');
+  }
+
+  mobileListBtn?.addEventListener('click', () => {
+    mobileListPanel?.classList.contains('open') ? closeMobileList() : openMobileList();
+  });
+  mobileListOverlay?.addEventListener('click', closeMobileList);
+  $('mobileListClose')?.addEventListener('click', closeMobileList);
   $('search').addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
   $('search-mobile')?.addEventListener('input', e => { searchQ=e.target.value.trim(); renderAll(); });
 

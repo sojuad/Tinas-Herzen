@@ -19,6 +19,7 @@
     <span class="search-icon">&#9906;</span>
     <input id="search-mobile" class="search" placeholder="Suchen …" autocomplete="off"/>
   </div>
+  <button class="mobile-filter-btn" id="mobileListBtn" aria-label="Alle Herzen anzeigen">&#128203;</button>
   <button class="mobile-filter-btn" id="mobileFilterBtn">&#9776;</button>
 </header>
 
@@ -38,6 +39,16 @@
   </div>
 </div>
 <div class="mobile-filter-overlay" id="mobileFilterOverlay"></div>
+
+<!-- MOBILE LISTE (alle Herzen, durchscrollbar, Klick springt auf der Karte hin) -->
+<div class="mobile-list-panel" id="mobileListPanel">
+  <div class="mobile-list-head">
+    <div class="mobile-list-count" id="mobileListCount">Lade …</div>
+    <button class="mobile-list-close" id="mobileListClose">&#10005;</button>
+  </div>
+  <div id="mobileList" class="list"></div>
+</div>
+<div class="mobile-list-overlay" id="mobileListOverlay"></div>
 
 <!-- DESKTOP LAYOUT -->
 <main class="layout">
