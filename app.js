@@ -478,4 +478,18 @@
   };
 
   loadPlaces();
+
+  // ── HOOK FÜR STATS-SEITE (stats.js) ─────────────────────────────
+  // Minimaler, nicht-invasiver Export: erlaubt stats.js, per Klick auf ein Herz
+  // in der Statistik-Liste zur Stelle auf der Karte zu springen und das
+  // Popup zu öffnen, ohne dass app.js sonst irgendetwas ändern muss.
+  window.__tinasHerzen = {
+    getPlaces: () => allPlaces,
+    flyToPlace: id => {
+      const p = allPlaces.find(x => x.id === id);
+      if(!p) return;
+      selectPlace(id);
+      map.flyTo({ center:[p.lng, p.lat], zoom: Math.max(map.getZoom(), 7), duration: 4000, essential: true });
+    }
+  };
 })();

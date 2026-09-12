@@ -7,6 +7,7 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.29.0/mapbox-gl.css" rel="stylesheet"/>
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.29.0/mapbox-gl.js"></script>
   <link rel="stylesheet" href="./style.css"/>
+  <link rel="stylesheet" href="./style-stats.css"/>
 </head>
 <body>
 
@@ -34,6 +35,9 @@
   <div class="mobile-filter-section">
     <div class="mobile-filter-label">Jahr</div>
     <div id="chips-mobile-year" class="filter-wrap mobile-chips"></div>
+  </div>
+  <div class="mobile-filter-section">
+    <button class="stats-btn" id="statsBtnMobile">&#128202; Statistiken</button>
   </div>
 </div>
 <div class="mobile-filter-overlay" id="mobileFilterOverlay"></div>
@@ -76,6 +80,7 @@
             <div id="chips-year" class="filter-wrap"></div>
           </div>
         </div>
+        <button class="stats-btn" id="statsBtn">&#128202; Statistiken</button>
       </div>
     </div>
     <div class="count-bar" id="countBar">Lade …</div>
@@ -107,6 +112,20 @@
   </section>
 </main>
 
+<!-- STATISTIKEN OVERLAY -->
+<div class="stats-overlay hidden" id="statsOverlay">
+  <div class="stats-panel">
+    <div class="stats-panel-head">
+      <div class="stats-panel-title">&#128202; Statistiken</div>
+      <button class="stats-close" id="statsClose">&#10005;</button>
+    </div>
+    <div class="stats-panel-body" id="statsBody">
+      <div class="stats-loading">Lade Statistiken …</div>
+    </div>
+  </div>
+</div>
+
 <script src="./app.js"></script>
+<script src="./stats.js"></script>
 </body>
 </html>
