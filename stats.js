@@ -308,8 +308,8 @@
         sec.innerHTML = `<div class="stats-section-title">&#9968; Höhe &amp; Meerestiefe</div><div class="stats-error">Höhendaten konnten nicht geladen werden.</div>`;
         return;
       }
-      const top10High = topN(withElev, (a,b) => b.elevation - a.elevation, 10);
-      const top10Low  = topN(withElev, (a,b) => a.elevation - b.elevation, 10);
+      const top10High = topN(withElev, (a,b) => b.elevation - a.elevation, TOP_N);
+      const top10Low  = topN(withElev, (a,b) => a.elevation - b.elevation, TOP_N);
 
       sec.innerHTML = `
         <div class="stats-section-title">&#9968; Höhe &amp; Meerestiefe
@@ -317,13 +317,13 @@
         </div>
         <div class="stats-grid">
           <div class="stats-card">
-            <div class="stats-card-label">Top 10 höchstgelegen</div>
+            <div class="stats-card-label">Top ${TOP_N} höchstgelegen</div>
             <div class="stats-list">
               ${top10High.map((x,i) => miniRowHtml(i+1, x.p, fmtNum(x.elevation) + ' m')).join('')}
             </div>
           </div>
           <div class="stats-card">
-            <div class="stats-card-label">Top 10 tiefstgelegen</div>
+            <div class="stats-card-label">Top ${TOP_N} tiefstgelegen</div>
             <div class="stats-list">
               ${top10Low.map((x,i) => miniRowHtml(i+1, x.p, fmtNum(x.elevation) + ' m', { neg: x.elevation < 0 })).join('')}
             </div>
