@@ -370,9 +370,9 @@
           <span class="stats-section-note">Wetterjahr ${year}, Quelle: Open-Meteo</span>
         </div>
         <div class="stats-grid">
-          ${topCardHtml('Heißestes Herz', hottest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
-          ${topCardHtml('Kühlstgelegenes Herz', coldest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
-          ${topCardHtml('Regenreichstes Herz', rainiest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.precipSum) + ' mm' })), `Jahressumme ${year}`)}
+          ${topCardHtml('Höchste Temperatur', hottest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
+          ${topCardHtml('Tiefste Temperatur', coldest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
+          ${topCardHtml('Höchster Niederschlag', rainiest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.precipSum) + ' mm' })), `Jahressumme ${year}`)}
         </div>
       `;
       wireClicks(sec);
