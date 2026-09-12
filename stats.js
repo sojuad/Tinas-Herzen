@@ -6,11 +6,13 @@
   // Herz zur Stelle auf der Karte zu springen). Lädt places.json selbst
   // nach, damit die Reihenfolge/Timing von app.js keine Rolle spielt.
   //
-  // Datenquellen für Höhe/Klima (beides kostenlos, ohne Key, CORS-offen):
-  //   - Höhe/Meerestiefe: OpenTopoData, Dataset "gebco2020"
-  //     (einziges Dataset, das sowohl Landhöhe als auch echte
-  //     Meerestiefe liefert – wichtig für "tiefstgelegen" bei Herzen,
-  //     die auf dem offenen Meer liegen, z.B. Wal-Beobachtungen)
+  // Datenquellen (beide kostenlos, ohne Key, CORS-offen im Browser):
+  //   - Höhe/Meerestiefe: NOAA NCEI "DEM global mosaic" ImageServer
+  //     (ETOPO-basiert) – liefert in EINER Anfrage sowohl Landhöhe als
+  //     auch echte Meerestiefe (negative Werte). Wichtig für Herzen,
+  //     die auf offenem Wasser liegen (z.B. Wal-Beobachtungen) – die
+  //     zuvor getestete OpenTopoData-API wurde verworfen, weil sie
+  //     keine CORS-Header sendet und im echten Browser fehlschlägt.
   //   - Klima (Temperatur/Niederschlag): Open-Meteo Archive API,
   //     Tageswerte für das letzte abgeschlossene Kalenderjahr, daraus
   //     Jahresmittel-Temperatur & Jahres-Niederschlagssumme berechnet.
@@ -21,8 +23,9 @@
 
   const $ = id => document.getElementById(id);
   const KOELN = { lat: 50.9375, lng: 6.9603 };
-  const CACHE_KEY = 'th_stats_cache_v1';
-  const CACHE_VERSION = 1;
+  const CACHE_KEY = 'th_stats_cache_v2';
+  const CACHE_VERSION = 2;
+  const TOP_N = 3; // wie viele Plätze pro "Sieger"-Karte immer gezeigt werden
 
   const escHtml = s => String(s == null ? '' : s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -55,26 +58,44 @@
   };
 
   const coordsMatch = (a, p) => a && Math.abs(a.lat - p.lat) < 1e-4 && Math.abs(a.lng - p.lng) < 1e-4;
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // ── ELEVATION / MEERESTIEFE (OpenTopoData, gebco2020) ───────────
-  // Batches klein halten (der öffentliche Demo-Server reagiert bei
-  // größeren Batches gelegentlich mit 400) und bei Fehlern rekursiv
-  // halbieren statt komplett abzubrechen.
+  // ── HÖHE / MEERESTIEFE (NOAA NCEI DEM global mosaic, ETOPO) ──────
+  // Ein einziger Request kann problemlos hunderte Punkte per
+  // "esriGeometryMultipoint" verarbeiten (getestet mit 157 Punkten in
+  // einem Rutsch) – trotzdem in Chunks von 100, damit die Sammlung
+  // auch bei künftigem Wachstum robust bleibt. Bei Fehlern wird der
+  // Chunk rekursiv halbiert statt komplett aufzugeben.
+  const ELEVATION_URL = 'https://gis.ngdc.noaa.gov/arcgis/rest/services/DEM_mosaics/DEM_global_mosaic/ImageServer/getSamples';
+
   const fetchElevationBatch = async places => {
     if(places.length === 0) return {};
-    const locs = places.map(p => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`).join('|');
-    const url = `https://api.opentopodata.org/v1/gebco2020?locations=${encodeURIComponent(locs)}`;
+    const geometry = {
+      points: places.map(p => [p.lng, p.lat]),
+      spatialReference: { wkid: 4326 }
+    };
+    const url = `${ELEVATION_URL}?geometryType=esriGeometryMultipoint` +
+      `&geometry=${encodeURIComponent(JSON.stringify(geometry))}` +
+      `&returnFirstValueOnly=true&f=json`;
     try {
       const res = await fetch(url);
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      if(!data.results || data.results.length !== places.length) throw new Error('Antwort unvollständig');
+      if(data.error) throw new Error(data.error.message || 'API-Fehler');
+      if(!data.samples || data.samples.length !== places.length) throw new Error('Antwort unvollständig');
+      // WICHTIG: Der Server sortiert die Samples bei größeren Batches intern um
+      // (Array-Position ≠ Eingabe-Reihenfolge!) – die einzig verlässliche
+      // Zuordnung ist das mitgelieferte locationId, das dem Index im
+      // gesendeten "points"-Array entspricht.
+      const byLocationId = {};
+      data.samples.forEach(s => { byLocationId[s.locationId] = s.value; });
       const out = {};
-      places.forEach((p, i) => { out[p.id] = data.results[i].elevation; });
+      places.forEach((p, i) => {
+        const val = parseFloat(byLocationId[i]);
+        out[p.id] = Number.isFinite(val) ? val : null;
+      });
       return out;
     } catch(err) {
-      if(places.length === 1) { return { [places[0].id]: null }; }
+      if(places.length === 1) return { [places[0].id]: null };
       const mid = Math.ceil(places.length / 2);
       const a = await fetchElevationBatch(places.slice(0, mid));
       const b = await fetchElevationBatch(places.slice(mid));
@@ -84,13 +105,12 @@
 
   const fetchAllElevations = async (places, onProgress) => {
     const out = {};
-    const BATCH = 8;
+    const BATCH = 100;
     for(let i = 0; i < places.length; i += BATCH) {
       const chunk = places.slice(i, i + BATCH);
       const res = await fetchElevationBatch(chunk);
       Object.assign(out, res);
       if(onProgress) onProgress(Math.min(i + BATCH, places.length), places.length);
-      if(i + BATCH < places.length) await sleep(350); // Rate-Limit des freien Servers respektieren
     }
     return out;
   };
@@ -132,13 +152,12 @@
 
   const fetchAllClimate = async (places, year, onProgress) => {
     const out = {};
-    const BATCH = 12;
+    const BATCH = 15;
     for(let i = 0; i < places.length; i += BATCH) {
       const chunk = places.slice(i, i + BATCH);
       const res = await fetchClimateBatch(chunk, year);
       Object.assign(out, res);
       if(onProgress) onProgress(Math.min(i + BATCH, places.length), places.length);
-      if(i + BATCH < places.length) await sleep(150);
     }
     return out;
   };
@@ -146,20 +165,22 @@
   // ── RENDER HELPERS ───────────────────────────────────────────────
   const placeSub = p => [p.country, p.continent].filter(Boolean).join(' · ');
 
-  const rowHtml = (rank, p, valueLabel, opts={}) => `
+  // Kompakte Zeile, in Top-10-Listen UND in den Top-3-Karten verwendet.
+  const miniRowHtml = (rank, p, valueLabel, opts={}) => `
     <div class="stats-row" data-id="${escHtml(p.id)}">
       <div class="stats-row-rank">${rank}</div>
       <div class="stats-row-title">${escHtml(p.title)}</div>
-      <div class="stats-row-sub">${escHtml(opts.sub != null ? opts.sub : placeSub(p))}</div>
       <div class="stats-row-value${opts.neg ? ' neg' : ''}">${valueLabel}</div>
     </div>`;
 
-  const cardHtml = (label, valueLabel, p, sub) => `
-    <div class="stats-card" data-id="${escHtml(p.id)}">
-      <div class="stats-card-label">${escHtml(label)}</div>
-      <div class="stats-card-value">${valueLabel}</div>
-      <div class="stats-card-place">${escHtml(p.title)}</div>
-      <div class="stats-card-sub">${escHtml(sub != null ? sub : placeSub(p))}</div>
+  // Kompakte Karte: Titel/Label oben, darunter immer die Top 3 (statt nur
+  // dem Sieger) – kleiner als vorher und trotzdem informativer.
+  const topCardHtml = (label, items, note) => `
+    <div class="stats-card">
+      <div class="stats-card-label">${escHtml(label)}${note ? ` <span class="stats-card-note">${escHtml(note)}</span>` : ''}</div>
+      <div class="stats-list">
+        ${items.map((it, i) => miniRowHtml(i+1, it.p, it.valueLabel, it.opts)).join('')}
+      </div>
     </div>`;
 
   const wireClicks = container => {
@@ -171,6 +192,8 @@
       });
     });
   };
+
+  const topN = (arr, cmp, n=TOP_N) => [...arr].sort(cmp).slice(0, n);
 
   // ── MAIN ─────────────────────────────────────────────────────────
   let started = false;
@@ -199,32 +222,28 @@
     }
 
     // ── 1) Geometrie-Statistiken (sofort, ohne Netzwerk) ──────────
-    const north = places.reduce((a,b) => b.lat > a.lat ? b : a);
-    const south = places.reduce((a,b) => b.lat < a.lat ? b : a);
+    const byLatDesc = topN(places, (a,b) => b.lat - a.lat);
+    const byLatAsc  = topN(places, (a,b) => a.lat - b.lat);
 
-    let farthestFromKoeln = places[0], maxKoelnDist = -1;
     const distSum = new Map();
+    const distKoeln = new Map();
     for(const p of places) {
-      const dK = haversineKm(KOELN.lat, KOELN.lng, p.lat, p.lng);
-      if(dK > maxKoelnDist) { maxKoelnDist = dK; farthestFromKoeln = p; }
+      distKoeln.set(p.id, haversineKm(KOELN.lat, KOELN.lng, p.lat, p.lng));
       let sum = 0;
       for(const q of places) { if(q.id !== p.id) sum += haversineKm(p.lat, p.lng, q.lat, q.lng); }
       distSum.set(p.id, sum / (places.length - 1));
     }
-    let farthestFromAll = places[0], maxAvgDist = -1;
-    for(const p of places) {
-      const avg = distSum.get(p.id);
-      if(avg > maxAvgDist) { maxAvgDist = avg; farthestFromAll = p; }
-    }
+    const byKoelnDesc = topN(places, (a,b) => distKoeln.get(b.id) - distKoeln.get(a.id));
+    const byAvgDistDesc = topN(places, (a,b) => distSum.get(b.id) - distSum.get(a.id));
 
     body.innerHTML = `
       <div>
         <div class="stats-section-title">&#128506; Geografische Extreme</div>
         <div class="stats-grid">
-          ${cardHtml('Nördlichstes Herz', fmtNum(north.lat,4) + '° N', north)}
-          ${cardHtml('Südlichstes Herz', fmtNum(Math.abs(south.lat),4) + '° ' + (south.lat<0?'S':'N'), south)}
-          ${cardHtml('Am weitesten von Köln', fmtNum(maxKoelnDist) + ' km', farthestFromKoeln)}
-          ${cardHtml('Am weitesten von allen anderen', '⌀ ' + fmtNum(maxAvgDist) + ' km', farthestFromAll, placeSub(farthestFromAll) + ' · Durchschnitt zu allen anderen Herzen')}
+          ${topCardHtml('Nördlichstes Herz', byLatDesc.map(p => ({ p, valueLabel: fmtNum(p.lat,4) + '° N' })))}
+          ${topCardHtml('Südlichstes Herz', byLatAsc.map(p => ({ p, valueLabel: fmtNum(Math.abs(p.lat),4) + '° ' + (p.lat<0?'S':'N') })))}
+          ${topCardHtml('Am weitesten von Köln', byKoelnDesc.map(p => ({ p, valueLabel: fmtNum(distKoeln.get(p.id)) + ' km' })))}
+          ${topCardHtml('Am weitesten von allen anderen', byAvgDistDesc.map(p => ({ p, valueLabel: '⌀ ' + fmtNum(distSum.get(p.id)) + ' km' })), 'Ø-Distanz zu allen anderen Herzen')}
         </div>
       </div>
       <div id="statsElevationSection">
@@ -264,25 +283,24 @@
         sec.innerHTML = `<div class="stats-section-title">&#9968; Höhe &amp; Meerestiefe</div><div class="stats-error">Höhendaten konnten nicht geladen werden.</div>`;
         return;
       }
-      const sorted = [...withElev].sort((a,b) => b.elevation - a.elevation);
-      const top10High = sorted.slice(0, 10);
-      const top10Low = [...withElev].sort((a,b) => a.elevation - b.elevation).slice(0, 10);
+      const top10High = topN(withElev, (a,b) => b.elevation - a.elevation, 10);
+      const top10Low  = topN(withElev, (a,b) => a.elevation - b.elevation, 10);
 
       sec.innerHTML = `
         <div class="stats-section-title">&#9968; Höhe &amp; Meerestiefe
           <span class="stats-section-note">Meerestiefe wird bei Herzen auf offenem Wasser ermittelt (negative Werte)</span>
         </div>
         <div class="stats-grid">
-          <div>
-            <div class="stats-card-label" style="margin-bottom:6px;">Top 10 höchstgelegen</div>
+          <div class="stats-card">
+            <div class="stats-card-label">Top 10 höchstgelegen</div>
             <div class="stats-list">
-              ${top10High.map((x,i) => rowHtml(i+1, x.p, fmtNum(x.elevation) + ' m')).join('')}
+              ${top10High.map((x,i) => miniRowHtml(i+1, x.p, fmtNum(x.elevation) + ' m')).join('')}
             </div>
           </div>
-          <div>
-            <div class="stats-card-label" style="margin-bottom:6px;">Top 10 tiefstgelegen</div>
+          <div class="stats-card">
+            <div class="stats-card-label">Top 10 tiefstgelegen</div>
             <div class="stats-list">
-              ${top10Low.map((x,i) => rowHtml(i+1, x.p, fmtNum(x.elevation) + ' m', { neg: x.elevation < 0 })).join('')}
+              ${top10Low.map((x,i) => miniRowHtml(i+1, x.p, fmtNum(x.elevation) + ' m', { neg: x.elevation < 0 })).join('')}
             </div>
           </div>
         </div>
@@ -318,18 +336,18 @@
         sec.innerHTML = `<div class="stats-section-title">&#127777; Klima</div><div class="stats-error">Klimadaten konnten nicht geladen werden.</div>`;
         return;
       }
-      const hottest = withClimate.reduce((a,b) => b.c.tempMean > a.c.tempMean ? b : a);
-      const coldest = withClimate.reduce((a,b) => b.c.tempMean < a.c.tempMean ? b : a);
-      const rainiest = withClimate.reduce((a,b) => b.c.precipSum > a.c.precipSum ? b : a);
+      const hottest  = topN(withClimate, (a,b) => b.c.tempMean - a.c.tempMean);
+      const coldest  = topN(withClimate, (a,b) => a.c.tempMean - b.c.tempMean);
+      const rainiest = topN(withClimate, (a,b) => b.c.precipSum - a.c.precipSum);
 
       sec.innerHTML = `
         <div class="stats-section-title">&#127777; Klima
           <span class="stats-section-note">Wetterjahr ${year}, Quelle: Open-Meteo</span>
         </div>
         <div class="stats-grid">
-          ${cardHtml('Heißestes Herz', fmtNum(hottest.c.tempMean,1) + ' °C ⌀', hottest.p, placeSub(hottest.p) + ` · Jahresmittel ${year}`)}
-          ${cardHtml('Kühlstgelegenes Herz', fmtNum(coldest.c.tempMean,1) + ' °C ⌀', coldest.p, placeSub(coldest.p) + ` · Jahresmittel ${year}`)}
-          ${cardHtml('Regenreichstes Herz', fmtNum(rainiest.c.precipSum) + ' mm', rainiest.p, placeSub(rainiest.p) + ` · Jahressumme ${year}`)}
+          ${topCardHtml('Heißestes Herz', hottest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
+          ${topCardHtml('Kühlstgelegenes Herz', coldest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
+          ${topCardHtml('Regenreichstes Herz', rainiest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.precipSum) + ' mm' })), `Jahressumme ${year}`)}
         </div>
       `;
       wireClicks(sec);
