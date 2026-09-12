@@ -485,6 +485,7 @@
   // Popup zu öffnen, ohne dass app.js sonst irgendetwas ändern muss.
   window.__tinasHerzen = {
     getPlaces: () => allPlaces,
+    map,
     flyToPlace: id => {
       const p = allPlaces.find(x => x.id === id);
       if(!p) return;

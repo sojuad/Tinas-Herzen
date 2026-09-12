@@ -207,6 +207,25 @@
 }
 .stats-row-value.neg { color: #7ec8ff; }
 
+/* ── GEOGRAFISCHE EXTREME: erzwungenes 2×2-Raster ──
+   Immer genau 2 Spalten (→ 2 Zeilen bei 4 Karten), damit die vollen
+   Herz-Titel Platz haben statt per Ellipsis gekürzt zu werden. */
+.stats-grid.stats-grid-wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.stats-grid-wide .stats-row-title {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.25;
+}
+.stats-grid-wide .stats-row {
+  align-items: flex-start;
+}
+.stats-grid-wide .stats-row-rank {
+  margin-top: 1px;
+}
+
 /* ── MOBILE ── */
 @media (max-width: 768px) {
   .stats-overlay { padding: 0; align-items: flex-end; }
@@ -219,4 +238,5 @@
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid.stats-grid-wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

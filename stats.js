@@ -195,6 +195,31 @@
 
   const topN = (arr, cmp, n=TOP_N) => [...arr].sort(cmp).slice(0, n);
 
+  // ── KARTEN-BUTTON ────────────────────────────────────────────────
+  // Ersetzt die alten Sidebar-/Mobile-Buttons: eigener Mapbox-Control,
+  // der optisch zum Kartenstil-Umschalter (LayerSwitchControl in app.js)
+  // passt und direkt in der Steuerelement-Leiste oben links erscheint –
+  // dadurch automatisch auch auf Mobile sichtbar (die Karte hat dort
+  // keinen eigenen Umschalter, aber die Mapbox-Controls sind immer da).
+  class StatsMapControl {
+    onAdd(mapInstance) {
+      this._map = mapInstance;
+      const el = document.createElement('div');
+      el.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'layer-switch-btn';
+      btn.setAttribute('aria-label', 'Statistiken');
+      btn.title = 'Statistiken';
+      btn.innerHTML = '&#128202;';
+      btn.addEventListener('click', e => { e.stopPropagation(); openStats(); });
+      el.appendChild(btn);
+      this._container = el;
+      return el;
+    }
+    onRemove() { this._container.parentNode?.removeChild(this._container); }
+  }
+
   // ── MAIN ─────────────────────────────────────────────────────────
   let started = false;
 
@@ -239,7 +264,7 @@
     body.innerHTML = `
       <div>
         <div class="stats-section-title">&#128506; Geografische Extreme</div>
-        <div class="stats-grid">
+        <div class="stats-grid stats-grid-wide">
           ${topCardHtml('Nördlichstes Herz', byLatDesc.map(p => ({ p, valueLabel: fmtNum(p.lat,4) + '° N' })))}
           ${topCardHtml('Südlichstes Herz', byLatAsc.map(p => ({ p, valueLabel: fmtNum(Math.abs(p.lat),4) + '° ' + (p.lat<0?'S':'N') })))}
           ${topCardHtml('Am weitesten von Köln', byKoelnDesc.map(p => ({ p, valueLabel: fmtNum(distKoeln.get(p.id)) + ' km' })))}
@@ -354,14 +379,12 @@
     })();
   };
 
-  $('statsBtn')?.addEventListener('click', openStats);
-  $('statsBtnMobile')?.addEventListener('click', () => { closeMobileFilterIfPossible(); openStats(); });
   $('statsClose')?.addEventListener('click', () => $('statsOverlay').classList.add('hidden'));
   $('statsOverlay')?.addEventListener('click', e => { if(e.target.id === 'statsOverlay') $('statsOverlay').classList.add('hidden'); });
 
-  function closeMobileFilterIfPossible() {
-    $('mobileFilterPanel')?.classList.remove('open');
-    $('mobileFilterBtn')?.classList.remove('open');
-    $('mobileFilterOverlay')?.classList.remove('open');
+  // Button direkt als Kartensteuerelement hinzufügen (oben links, unter
+  // Zoom + Kartenstil-Umschalter) – funktioniert dadurch auch auf Mobile.
+  if (window.__tinasHerzen && window.__tinasHerzen.map) {
+    window.__tinasHerzen.map.addControl(new StatsMapControl(), 'top-left');
   }
 })();
