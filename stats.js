@@ -25,7 +25,7 @@
   const KOELN = { lat: 50.9375, lng: 6.9603 };
   const CACHE_KEY = 'th_stats_cache_v2';
   const CACHE_VERSION = 2;
-  const TOP_N = 3; // wie viele Plätze pro "Sieger"-Karte immer gezeigt werden
+  const TOP_N = 4; // wie viele Plätze pro "Sieger"-Karte immer gezeigt werden
 
   const escHtml = s => String(s == null ? '' : s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
