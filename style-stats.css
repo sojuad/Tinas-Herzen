@@ -159,6 +159,14 @@
   color: rgba(255,255,255,0.35);
 }
 
+/* ── GROSSE-ZAHL-KARTE (z.B. "12 Länder besucht") ── */
+.stats-bignum {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 2px 1px;
+}
+
 /* ── KOMPAKTE ZEILE (in Karten UND in den Top-10-Listen) ── */
 .stats-list {
   display: flex;
@@ -175,6 +183,9 @@
   transition: background 0.15s;
 }
 .stats-row:hover { background: rgba(255,255,255,0.08); }
+/* Statische Zeile (Land/Kontinent-Ranking) – kein Klickziel, daher kein Hover. */
+.stats-row.static { cursor: default; }
+.stats-row.static:hover { background: transparent; }
 .stats-row-rank {
   flex-shrink: 0;
   width: 17px;

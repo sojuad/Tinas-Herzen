@@ -123,7 +123,7 @@
     const lats = places.map(p => p.lat.toFixed(4)).join(',');
     const lngs = places.map(p => p.lng.toFixed(4)).join(',');
     const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lats}&longitude=${lngs}` +
-      `&start_date=${year}-01-01&end_date=${year}-12-31&daily=temperature_2m_mean,precipitation_sum&timezone=UTC`;
+      `&start_date=${year}-01-01&end_date=${year}-12-31&daily=temperature_2m_mean,precipitation_sum,sunshine_duration&timezone=UTC`;
     try {
       const res = await fetch(url);
       if(!res.ok) throw new Error('HTTP ' + res.status);
@@ -136,9 +136,12 @@
         if(!d || !d.temperature_2m_mean || !d.precipitation_sum) { out[p.id] = null; return; }
         const temps = d.temperature_2m_mean.filter(v => v != null);
         const precs = d.precipitation_sum.filter(v => v != null);
+        // sunshine_duration liefert Sekunden pro Tag – für die Jahressumme in Stunden umrechnen.
+        const suns = (d.sunshine_duration || []).filter(v => v != null);
         const tempMean = temps.length ? temps.reduce((a,b)=>a+b,0) / temps.length : null;
         const precipSum = precs.length ? precs.reduce((a,b)=>a+b,0) : null;
-        out[p.id] = { tempMean, precipSum };
+        const sunHours = suns.length ? suns.reduce((a,b)=>a+b,0) / 3600 : null;
+        out[p.id] = { tempMean, precipSum, sunHours };
       });
       return out;
     } catch(err) {
@@ -181,6 +184,30 @@
       <div class="stats-list">
         ${items.map((it, i) => miniRowHtml(i+1, it.p, it.valueLabel, it.opts)).join('')}
       </div>
+    </div>`;
+
+  // Statische Zeile für Namen+Anzahl (Land/Kontinent-Ranking) – kein Klick,
+  // da es sich nicht um ein einzelnes Herz handelt.
+  const nameCountRowHtml = (rank, name, count) => `
+    <div class="stats-row static">
+      <div class="stats-row-rank">${rank}</div>
+      <div class="stats-row-title">${escHtml(name)}</div>
+      <div class="stats-row-value">${count} Herz${count!==1?'en':''}</div>
+    </div>`;
+
+  const countCardHtml = (label, entries, note) => `
+    <div class="stats-card">
+      <div class="stats-card-label">${escHtml(label)}${note ? ` <span class="stats-card-note">${escHtml(note)}</span>` : ''}</div>
+      <div class="stats-list">
+        ${entries.map((e,i) => nameCountRowHtml(i+1, e[0], e[1])).join('')}
+      </div>
+    </div>`;
+
+  // Karte mit einer einzelnen großen Zahl (z.B. "12 Länder").
+  const bigNumberCardHtml = (label, value, note) => `
+    <div class="stats-card">
+      <div class="stats-card-label">${escHtml(label)}${note ? ` <span class="stats-card-note">${escHtml(note)}</span>` : ''}</div>
+      <div class="stats-bignum">${value}</div>
     </div>`;
 
   const wireClicks = container => {
@@ -249,6 +276,8 @@
     // ── 1) Geometrie-Statistiken (sofort, ohne Netzwerk) ──────────
     const byLatDesc = topN(places, (a,b) => b.lat - a.lat);
     const byLatAsc  = topN(places, (a,b) => a.lat - b.lat);
+    const byLngDesc = topN(places, (a,b) => b.lng - a.lng); // Osten
+    const byLngAsc  = topN(places, (a,b) => a.lng - b.lng); // Westen
 
     const distSum = new Map();
     const distKoeln = new Map();
@@ -261,14 +290,48 @@
     const byKoelnDesc = topN(places, (a,b) => distKoeln.get(b.id) - distKoeln.get(a.id));
     const byAvgDistDesc = topN(places, (a,b) => distSum.get(b.id) - distSum.get(a.id));
 
+    // ── 1b) Länder / Kontinente ───────────────────────────────────
+    const countBy = key => {
+      const m = new Map();
+      for(const p of places) { const v = p[key]; if(!v) continue; m.set(v, (m.get(v)||0)+1); }
+      return [...m.entries()].sort((a,b) => b[1]-a[1]);
+    };
+    const countryCounts = countBy('country');
+    const continentCounts = countBy('continent');
+
+    // ── 1c) Chronologische Reiseroute & neuestes Herz ─────────────
+    const datedAsc = places.filter(p => p.date).slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+    let routeKm = 0;
+    for(let i=1;i<datedAsc.length;i++) routeKm += haversineKm(datedAsc[i-1].lat, datedAsc[i-1].lng, datedAsc[i].lat, datedAsc[i].lng);
+    const byNewest = datedAsc.slice(-TOP_N).reverse(); // die letzten N chronologisch, neuestes zuerst
+    const fmtDate = d => new Date(d).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+
     body.innerHTML = `
       <div>
         <div class="stats-section-title">&#128506; Geografische Extreme</div>
         <div class="stats-grid stats-grid-wide">
           ${topCardHtml('Nördlichstes Herz', byLatDesc.map(p => ({ p, valueLabel: fmtNum(p.lat,4) + '° N' })))}
           ${topCardHtml('Südlichstes Herz', byLatAsc.map(p => ({ p, valueLabel: fmtNum(Math.abs(p.lat),4) + '° ' + (p.lat<0?'S':'N') })))}
+          ${topCardHtml('Östlichstes Herz', byLngDesc.map(p => ({ p, valueLabel: fmtNum(Math.abs(p.lng),4) + '° ' + (p.lng<0?'W':'O') })))}
+          ${topCardHtml('Westlichstes Herz', byLngAsc.map(p => ({ p, valueLabel: fmtNum(Math.abs(p.lng),4) + '° ' + (p.lng<0?'W':'O') })))}
           ${topCardHtml('Am weitesten von Köln', byKoelnDesc.map(p => ({ p, valueLabel: fmtNum(distKoeln.get(p.id)) + ' km' })))}
           ${topCardHtml('Am weitesten von allen anderen', byAvgDistDesc.map(p => ({ p, valueLabel: '⌀ ' + fmtNum(distSum.get(p.id)) + ' km' })), 'Ø-Distanz zu allen anderen Herzen')}
+        </div>
+      </div>
+      <div>
+        <div class="stats-section-title">&#127760; Länder &amp; Kontinente</div>
+        <div class="stats-grid">
+          ${bigNumberCardHtml('Länder besucht', countryCounts.length)}
+          ${bigNumberCardHtml('Kontinente besucht', continentCounts.length)}
+          ${countCardHtml('Land mit den meisten Herzen', countryCounts.slice(0, TOP_N))}
+          ${countCardHtml('Kontinent mit den meisten Herzen', continentCounts.slice(0, TOP_N))}
+        </div>
+      </div>
+      <div>
+        <div class="stats-section-title">&#128197; Zeitliche Auswertung</div>
+        <div class="stats-grid">
+          ${topCardHtml('Neuestes Herz', byNewest.map(p => ({ p, valueLabel: fmtDate(p.date) })))}
+          ${bigNumberCardHtml('Chronologische Gesamtstrecke', fmtNum(routeKm) + ' km', `Route durch ${datedAsc.length} Herzen mit Datum, in zeitlicher Reihenfolge`)}
         </div>
       </div>
       <div id="statsElevationSection">
@@ -338,7 +401,7 @@
       const year = climateYear();
       const missing = places.filter(p => {
         const c = cache.climate[p.id];
-        return !c || c.year !== year || !coordsMatch(c, p);
+        return !c || c.year !== year || !coordsMatch(c, p) || c.sunHours == null;
       });
       if(missing.length) {
         await fetchAllClimate(missing, year, (done, total) => {
@@ -346,7 +409,7 @@
         }).then(res => {
           for(const p of missing) {
             const v = res[p.id];
-            if(v != null) cache.climate[p.id] = { lat: p.lat, lng: p.lng, year, tempMean: v.tempMean, precipSum: v.precipSum };
+            if(v != null) cache.climate[p.id] = { lat: p.lat, lng: p.lng, year, tempMean: v.tempMean, precipSum: v.precipSum, sunHours: v.sunHours };
           }
           saveCache(cache);
         });
@@ -354,6 +417,9 @@
       const withClimate = places
         .map(p => ({ p, c: cache.climate[p.id] }))
         .filter(x => x.c && x.c.tempMean != null && x.c.precipSum != null);
+      const withSun = places
+        .map(p => ({ p, c: cache.climate[p.id] }))
+        .filter(x => x.c && x.c.sunHours != null);
 
       const sec = $('statsClimateSection');
       if(!sec) return;
@@ -364,6 +430,7 @@
       const hottest  = topN(withClimate, (a,b) => b.c.tempMean - a.c.tempMean);
       const coldest  = topN(withClimate, (a,b) => a.c.tempMean - b.c.tempMean);
       const rainiest = topN(withClimate, (a,b) => b.c.precipSum - a.c.precipSum);
+      const sunniest = topN(withSun, (a,b) => b.c.sunHours - a.c.sunHours);
 
       sec.innerHTML = `
         <div class="stats-section-title">&#127777; Klima
@@ -373,6 +440,7 @@
           ${topCardHtml('Höchste Temperatur', hottest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
           ${topCardHtml('Tiefste Temperatur', coldest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.tempMean,1) + ' °C' })), `Jahresmittel ${year}`)}
           ${topCardHtml('Höchster Niederschlag', rainiest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.precipSum) + ' mm' })), `Jahressumme ${year}`)}
+          ${sunniest.length ? topCardHtml('Sonnigstes Herz', sunniest.map(x => ({ p: x.p, valueLabel: fmtNum(x.c.sunHours) + ' h' })), `Jahressumme ${year}`) : ''}
         </div>
       `;
       wireClicks(sec);
