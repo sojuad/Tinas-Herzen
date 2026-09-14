@@ -321,8 +321,8 @@
       <div>
         <div class="stats-section-title">&#127760; Länder &amp; Kontinente</div>
         <div class="stats-grid">
-          ${bigNumberCardHtml('Länder besucht', countryCounts.length)}
-          ${bigNumberCardHtml('Kontinente besucht', continentCounts.length)}
+          ${bigNumberCardHtml('Länder', countryCounts.length)}
+          ${bigNumberCardHtml('Kontinente', continentCounts.length)}
           ${countCardHtml('Land mit den meisten Herzen', countryCounts.slice(0, TOP_N))}
           ${countCardHtml('Kontinent mit den meisten Herzen', continentCounts.slice(0, TOP_N))}
         </div>
